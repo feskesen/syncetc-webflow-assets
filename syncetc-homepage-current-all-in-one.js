@@ -1339,13 +1339,13 @@
 /* syncetc_update_89_admin_edit_workspace_styles - END */
 
 
-/* syncetc_update_90_big_admin_controls_lab - BEGIN */
+/* syncetc_update_91_lab_usability_contrast - BEGIN */
 (function () {
   const ROOT_ID = "syncetc-generated-homepage-v2";
   const STYLE_ID = "syncetc-update-90-big-admin-controls-lab-style";
   const LAB_ID = "syncetc-master-controls-test-lab";
-  const VERSION_LABEL = "SyncEtc Hosted JS v18-admin-controls-lab";
-  const CACHE_BUSTER = "?v=18-admin-controls-lab";
+  const VERSION_LABEL = "SyncEtc Hosted JS v19-admin-controls-lab";
+  const CACHE_BUSTER = "?v=19-lab-usability-contrast";
 
   function escapeHtml(value) {
     return String(value == null ? "" : value)
@@ -1522,7 +1522,7 @@
   }
 
   function panelHtml(tab) {
-    const themeOptions = [["green","Aviation green"],["navy","Navy operations"],["slate","Neutral slate"],["sand","Warm sand"]];
+    const themeOptions = [["green","Airfield green"],["navy","Aviation blue"],["slate","Neutral slate"],["sand","Warm sand"]];
     const widthOptions = [["narrow","Narrow"],["normal","Normal"],["wide","Wide"]];
     const densityOptions = [["compact","Compact"],["comfortable","Comfortable"],["spacious","Spacious"]];
     const radiusOptions = [["square","Square"],["soft","Soft"],["round","Round"]];
@@ -1575,9 +1575,9 @@
         field("text", "heroHeadline", "Draft page name", "Reusable value shown in the preview.") +
       '</div><div class="se-master-lab-actions"><button type="button" data-se-lab-action="export">Export draft JSON</button><button type="button" class="secondary" data-se-lab-action="reset">Reset local lab</button></div><pre class="se-master-output" data-se-lab-output></pre>';
     }
-    return '<h3>Theme controls</h3><p>Preview high-level brand styling without allowing destructive arbitrary CSS.</p><div class="se-master-control-grid">' +
+    return '<h3>Theme controls</h3><p>Preview high-level brand styling with safe bounded values and contrast protection.</p><div class="se-master-control-grid">' +
       field("select", "theme", "Theme preset", "Bounded brand palette choice.", themeOptions) +
-      field("select", "backgroundMode", "Background mode", "Future Supabase asset/background handling.", [["none","None"],["image-muted","Muted image"],["color-soft","Soft color"],["pattern","Pattern placeholder"]]) +
+      field("select", "backgroundMode", "Background mode", "Preview-safe background treatment. This is now wired to the mini-preview only.", [["none","None"],["image-muted","Muted image"],["color-soft","Soft color"],["pattern","Pattern placeholder"]]) +
       field("select", "fontScale", "Font scale", "Bounded type scale.", scaleOptions) +
       field("select", "shadow", "Shadow", "Depth preset.", shadowOptions) +
     '</div>';
@@ -1612,7 +1612,7 @@
     lab.id = LAB_ID;
     lab.className = "se-master-controls-lab";
     lab.setAttribute("data-se-master-controls", "");
-    lab.innerHTML = '<div class="se-master-lab-head"><div><h2>Master Variables / Controls Test Lab</h2><p>Large prototype workspace for testing customer-facing controls, builder-only controls, style variables, module visibility, buttons, cards, metadata, and future save/publish boundaries.</p></div><div class="se-master-lab-badges"><span>JS v18</span><span>local draft only</span><span>no production save</span></div></div>' +
+    lab.innerHTML = '<div class="se-master-lab-head"><div><h2>Master Variables / Controls Test Lab</h2><p>Primary test workspace. Customer-facing and builder-only controls are intentionally shown near the top so test changes are easy to see.</p></div><div class="se-master-lab-badges"><span>JS v19</span><span>local draft only</span><span>no production save</span></div></div>' +
       '<div class="se-master-lab-tabs" data-se-lab-tabs>' +
         '<button class="se-master-lab-tab" data-se-lab-tab="theme">Theme</button>' +
         '<button class="se-master-lab-tab" data-se-lab-tab="content">Content</button>' +
@@ -1621,7 +1621,7 @@
         '<button class="se-master-lab-tab" data-se-lab-tab="modules">Modules</button>' +
         '<button class="se-master-lab-tab" data-se-lab-tab="metadata">Metadata/Export</button>' +
       '</div>' +
-      '<div class="se-master-lab-body"><div class="se-master-lab-panel" data-se-lab-panel></div><div class="se-master-lab-panel"><h3>Live bounded-preview output</h3><p>This preview changes immediately, but no database write occurs here yet.</p><div data-se-lab-preview></div></div></div>' +
+      '<div class="se-master-lab-body"><div class="se-master-lab-panel" data-se-lab-panel></div><div class="se-master-lab-panel"><h3>Live bounded-preview output</h3><p>This preview changes immediately. Export now copies the draft JSON locally. No database write occurs here yet.</p><div data-se-lab-preview></div></div></div>' +
       '<div class="se-master-lab-warning">Prototype boundary: this is intentionally a local draft test lab. The next production step is wiring controlled save actions to authenticated Supabase functions with customer scoping and audit logs.</div>';
 
     const shell = root.querySelector(".se-shell") || root;
@@ -1711,7 +1711,7 @@
       badge.id = FLOAT_BADGE_ID;
       document.body.appendChild(badge);
     }
-    badge.textContent = "JS v18 loaded";
+    badge.textContent = "JS v19 loaded";
     badge.setAttribute("data-syncetc-version", VERSION_LABEL);
     badge.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
     badge.style.cssText = "position:fixed;right:12px;top:12px;z-index:999999;background:#12351f;color:#ffffff;font-family:Arial,sans-serif;font-size:12px;font-weight:900;letter-spacing:.02em;padding:8px 11px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.55);pointer-events:none";
@@ -1727,12 +1727,152 @@
     installVersionMarkers();
     bindLab();
     renderLab();
-    console.log("SYNCETC UPDATE 90 MASTER CONTROLS LAB LOADED", VERSION_LABEL, CACHE_BUSTER);
+    console.log("SYNCETC UPDATE 91 MASTER CONTROLS LAB USABILITY LOADED", VERSION_LABEL, CACHE_BUSTER);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
 })();
-/* syncetc_update_90_big_admin_controls_lab - END */
+/* syncetc_update_91_lab_usability_contrast - END */
+
+
+/* syncetc_update_91_lab_usability_contrast_patch - BEGIN */
+(function () {
+  const ROOT_ID = "syncetc-generated-homepage-v2";
+  const LAB_ID = "syncetc-master-controls-lab";
+  const VERSION_LABEL = "JS v19-lab-usability-contrast";
+
+  function injectPatchStyles() {
+    if (document.getElementById("syncetc-update-91-lab-usability-styles")) return;
+    const style = document.createElement("style");
+    style.id = "syncetc-update-91-lab-usability-styles";
+    style.textContent = `
+      /* Update 91: contrast protection and lab-first testing layout */
+      .syncetc-homepage-v2.has-se-background-underlay::after { opacity: max(var(--se-underlay-overlay-opacity, .55), .68); background: rgba(246,250,252,.82); }
+      .syncetc-homepage-v2 .se-section,
+      .syncetc-homepage-v2 .se-topbar,
+      .syncetc-homepage-v2 .se-status,
+      .syncetc-homepage-v2 .se-admin-preview-bar,
+      .syncetc-homepage-v2 .se-admin-editing-preview,
+      .syncetc-homepage-v2 .se-master-controls-lab { background: rgba(255,255,255,.93) !important; backdrop-filter: blur(16px); }
+      .syncetc-homepage-v2 .se-master-controls-lab { margin-top: 14px; border: 2px solid rgba(18,54,90,.18); }
+      .syncetc-homepage-v2 .se-master-lab-head { background: linear-gradient(135deg, #12365a, #245c8d) !important; }
+      .syncetc-homepage-v2 .se-master-lab-head h2,
+      .syncetc-homepage-v2 .se-master-lab-head p { color:#fff !important; }
+      .syncetc-homepage-v2 .se-master-lab-badges span { background: rgba(255,255,255,.92) !important; color:#12365a !important; }
+      .syncetc-homepage-v2 .se-master-lab-panel h3::before { content: "Testing area · "; color:#2f80c4; font-weight:950; }
+      .syncetc-homepage-v2 .se-master-preview-shell { transition: all 160ms ease; }
+      .syncetc-homepage-v2[data-se-lab-background="none"] .se-master-preview-shell { background:#f7fafc; }
+      .syncetc-homepage-v2[data-se-lab-background="color-soft"] .se-master-preview-shell { background:linear-gradient(135deg,#eef7ff,#f7fbf1); }
+      .syncetc-homepage-v2[data-se-lab-background="pattern"] .se-master-preview-shell { background:repeating-linear-gradient(135deg,#f7fafc 0,#f7fafc 12px,#eef4f8 12px,#eef4f8 24px); }
+      .syncetc-homepage-v2[data-se-lab-background="image-muted"] .se-master-preview-shell { background:linear-gradient(rgba(255,255,255,.78),rgba(255,255,255,.78)), radial-gradient(circle at 25% 30%, rgba(47,128,196,.35), transparent 16rem), radial-gradient(circle at 80% 70%, rgba(18,54,90,.18), transparent 18rem), #eef4f8; }
+      .syncetc-homepage-v2[data-se-lab-hero-size="small"] .se-master-preview-hero { padding:14px !important; }
+      .syncetc-homepage-v2[data-se-lab-hero-size="medium"] .se-master-preview-hero { padding:24px !important; }
+      .syncetc-homepage-v2[data-se-lab-hero-size="large"] .se-master-preview-hero { padding:38px !important; }
+      .syncetc-homepage-v2 .se-master-preview-hero { background:linear-gradient(135deg, rgba(18,54,90,.98), rgba(47,128,196,.88)) !important; text-shadow:0 1px 2px rgba(0,0,0,.28); }
+      .syncetc-homepage-v2 .se-master-preview-hero .eyebrow,
+      .syncetc-homepage-v2 .se-master-preview-hero p { color:rgba(255,255,255,.94) !important; }
+      .syncetc-homepage-v2 .se-master-output::before { content:"Export preview / copied JSON target"; display:block; margin-bottom:6px; color:#bde5c8; font-weight:950; }
+      .syncetc-homepage-v2 .se-lab-export-status { margin-top:8px; padding:8px 10px; border-radius:12px; background:#eef7ff; color:#12365a; font-size:12px; font-weight:900; }
+      .syncetc-homepage-v2 .se-master-control small::after { content:""; }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function getRoot() { return document.getElementById(ROOT_ID); }
+
+  function readState() {
+    const root = getRoot();
+    if (!root) return {};
+    try { return JSON.parse(root.getAttribute("data-se-lab-state") || "{}"); } catch (e) { return {}; }
+  }
+
+  function applyPreviewAttributes() {
+    const root = getRoot();
+    if (!root) return;
+    const state = readState();
+    root.setAttribute("data-se-lab-background", state.backgroundMode || "image-muted");
+    root.setAttribute("data-se-lab-hero-size", state.heroSize || "medium");
+    const lab = document.getElementById(LAB_ID);
+    if (lab) {
+      lab.setAttribute("data-se-update", "91");
+      const title = lab.querySelector(".se-master-lab-head h2");
+      if (title && !title.textContent.includes("Top Test Area")) title.textContent = "Master Variables / Controls Test Lab · Top Test Area";
+      lab.querySelectorAll(".se-master-lab-badges span").forEach(function (span) {
+        if (span.textContent === "JS v19") span.textContent = VERSION_LABEL;
+      });
+    }
+  }
+
+  function moveLabUp() {
+    const root = getRoot();
+    const lab = document.getElementById(LAB_ID);
+    if (!root || !lab) return;
+    const status = root.querySelector("[data-se-status]");
+    const shell = root.querySelector(".se-shell") || root;
+    if (status && status.parentNode === shell && status.nextSibling !== lab) {
+      shell.insertBefore(lab, status.nextSibling);
+    }
+  }
+
+  function upgradeExportButton() {
+    document.addEventListener("click", function (event) {
+      const action = event.target.closest('[data-se-lab-action="export"]');
+      if (!action) return;
+      const lab = document.getElementById(LAB_ID);
+      if (!lab) return;
+      const state = readState();
+      const json = JSON.stringify(state, null, 2);
+      const output = lab.querySelector("[data-se-lab-output]");
+      if (output) output.textContent = json;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(json).catch(function () {});
+      }
+      let status = lab.querySelector(".se-lab-export-status");
+      if (!status) {
+        status = document.createElement("div");
+        status.className = "se-lab-export-status";
+        const actions = lab.querySelector(".se-master-lab-actions");
+        if (actions) actions.insertAdjacentElement("afterend", status);
+      }
+      if (status) status.textContent = "Export JSON refreshed and copy attempted locally. No production save occurred.";
+      const original = action.textContent;
+      action.textContent = "Export refreshed";
+      setTimeout(function () { action.textContent = original || "Export draft JSON"; }, 1200);
+    }, true);
+  }
+
+  function observeRoot() {
+    const root = getRoot();
+    if (!root || root.getAttribute("data-se-update-91-observing") === "true") return;
+    root.setAttribute("data-se-update-91-observing", "true");
+    const observer = new MutationObserver(function () {
+      applyPreviewAttributes();
+      moveLabUp();
+    });
+    observer.observe(root, { attributes:true, childList:true, subtree:true, attributeFilter:["data-se-lab-state"] });
+  }
+
+  function boot() {
+    injectPatchStyles();
+    applyPreviewAttributes();
+    moveLabUp();
+    observeRoot();
+    upgradeExportButton();
+    let tries = 0;
+    const timer = setInterval(function () {
+      tries += 1;
+      applyPreviewAttributes();
+      moveLabUp();
+      if (document.getElementById(LAB_ID) || tries > 30) clearInterval(timer);
+    }, 250);
+    console.log("SYNCETC UPDATE 91 LAB USABILITY PATCH LOADED", VERSION_LABEL);
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+/* syncetc_update_91_lab_usability_contrast_patch - END */
+
 
 /* syncetc-homepage-current-all-in-one.js - END */
