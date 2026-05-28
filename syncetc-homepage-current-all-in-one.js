@@ -2307,4 +2307,339 @@
 /* syncetc_update_92B_preview_position_fix - END */
 
 
+
+
+/* syncetc_update_93_simplified_priority_test_workbench - BEGIN */
+(function () {
+  const ROOT_ID = "syncetc-generated-homepage-v2";
+  const WORKBENCH_ID = "syncetc-priority-test-workbench";
+  const VERSION_LABEL = "JS v21-priority-test-workbench";
+  const CACHE_BUSTER = "?v=21-priority-workbench";
+  const STORAGE_KEY = "syncetc_priority_workbench_state_v21";
+
+  function root() { return document.getElementById(ROOT_ID); }
+  function esc(value) {
+    return String(value == null ? "" : value).replace(/[&<>\"']/g, function (char) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[char];
+    });
+  }
+  function jsonParse(raw, fallback) {
+    try { return JSON.parse(raw); } catch (error) { return fallback; }
+  }
+  function timestamp() {
+    return new Date().toISOString().replace(/[:.]/g, "-");
+  }
+  function downloadJson(fileName, data) {
+    const json = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    window.setTimeout(function () {
+      URL.revokeObjectURL(url);
+      a.remove();
+    }, 250);
+  }
+  function defaults() {
+    const r = root();
+    const name = r ? (r.querySelector("[data-se-customer-name]") || {}).textContent : "SyncEtc Customer";
+    const subtitle = r ? (r.querySelector("[data-se-customer-subtitle]") || {}).textContent : "Generated homepage";
+    return {
+      customer: (name || "SyncEtc Customer").trim(),
+      subtitle: (subtitle || "Generated homepage").trim(),
+      heroEyebrow: "Aviation club operations",
+      heroHeadline: "Priority testing workspace",
+      heroSubheadline: "This compact panel is now the primary test area. It keeps controls and preview together and hides lower informational sections by default.",
+      primaryLabel: "View dashboard",
+      secondaryLabel: "Contact us",
+      theme: "blue",
+      fontScale: "normal",
+      density: "comfortable",
+      buttonShape: "pill",
+      cardStyle: "soft",
+      contrast: "strong",
+      showGallery: true,
+      showAnnouncements: true,
+      showResources: true,
+      showAdmin: false,
+      compactMode: true,
+      tab: "content"
+    };
+  }
+  function readState() {
+    let saved = null;
+    try { saved = jsonParse(window.localStorage.getItem(STORAGE_KEY), null); } catch (error) {}
+    return Object.assign(defaults(), saved || {});
+  }
+  function writeState(state) {
+    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (error) {}
+  }
+  function injectStyles() {
+    if (document.getElementById("syncetc-update-93-priority-workbench-styles")) return;
+    const style = document.createElement("style");
+    style.id = "syncetc-update-93-priority-workbench-styles";
+    style.textContent = `
+      #syncetc-hosted-version-topbar {
+        background: #0b365c !important;
+        border-bottom-color: #9fd3ff !important;
+      }
+      #syncetc-visible-version-badge {
+        background: #0b365c !important;
+      }
+      .syncetc-homepage-v2.se-simplified-prototype [data-se-admin-preview],
+      .syncetc-homepage-v2.se-simplified-prototype [data-se-navigation-preview],
+      .syncetc-homepage-v2.se-simplified-prototype [data-se-backbone-preview],
+      .syncetc-homepage-v2.se-simplified-prototype [data-se-deployment-access-preview],
+      .syncetc-homepage-v2.se-simplified-prototype [data-se-boundary-preview],
+      .syncetc-homepage-v2.se-simplified-prototype [data-se-admin-editing-preview],
+      .syncetc-homepage-v2.se-simplified-prototype #syncetc-master-controls-lab,
+      .syncetc-homepage-v2.se-simplified-prototype #syncetc-master-controls-test-lab {
+        display: none !important;
+      }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} {
+        order: -50;
+        margin: 14px 0 18px;
+        border-radius: 20px;
+        overflow: hidden;
+        background: rgba(255,255,255,.97);
+        border: 2px solid rgba(11,54,92,.20);
+        box-shadow: 0 18px 50px rgba(9,38,64,.16);
+        backdrop-filter: blur(16px);
+      }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        padding: 18px 20px;
+        color: #fff;
+        background: linear-gradient(135deg, #0b365c, #2573ac);
+      }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-kicker { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity:.82; font-weight: 950; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} h2 { margin: 5px 0 4px; font-size: 25px; line-height: 1.08; color:#fff; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-head p { margin: 0; color: rgba(255,255,255,.86); font-size: 13px; line-height: 1.4; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; min-width: 210px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-badges span { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.28); color:#fff; border-radius:999px; padding: 7px 9px; font-size: 11px; font-weight:950; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-tabs { display:flex; gap:8px; flex-wrap:wrap; padding: 12px 16px; background:#eef6fb; border-bottom:1px solid rgba(11,54,92,.12); }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-tab,
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-action { border:1px solid rgba(11,54,92,.16); background:#fff; color:#102f4a; border-radius:999px; padding: 9px 12px; font-size: 12px; font-weight:950; cursor:pointer; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-tab.is-active,
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-action.primary { background:#0b365c; color:#fff; border-color:#0b365c; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-grid { display:grid; grid-template-columns: minmax(0,1.02fr) minmax(360px,.98fr); gap: 16px; padding: 18px; align-items:start; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-panel { border:1px solid rgba(11,54,92,.12); border-radius:16px; background:#fff; padding:14px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-panel h3 { margin:0 0 4px; color:#102f4a; font-size: 16px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-panel p { margin:0 0 12px; color:#536678; font-size: 13px; line-height:1.4; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-controls { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} label { display:block; font-size:12px; font-weight:950; color:#193c5d; margin-bottom:5px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} input[type="text"],
+      .syncetc-homepage-v2 #${WORKBENCH_ID} textarea,
+      .syncetc-homepage-v2 #${WORKBENCH_ID} select { width:100%; box-sizing:border-box; border:1px solid rgba(11,54,92,.18); border-radius:10px; padding:10px; color:#102f4a; background:#fff; font: inherit; font-size:13px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} textarea { min-height:84px; resize: vertical; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} small { display:block; margin-top:5px; color:#738293; font-size:11px; line-height:1.35; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-toggle { display:flex; gap:8px; align-items:flex-start; padding:9px; border:1px solid rgba(11,54,92,.12); border-radius:12px; background:#f9fbfc; font-weight:900; font-size:13px; color:#102f4a; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-toggle input { margin-top:2px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-preview-card { position: sticky; top: 14px; border-radius:18px; padding:14px; background:#f7fbfd; border:1px solid rgba(11,54,92,.12); }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-preview-hero { border-radius:18px; padding:22px; color:#fff; background: linear-gradient(135deg, var(--se-pw-primary,#0b5a8f), var(--se-pw-secondary,#184c70)); box-shadow: 0 18px 35px rgba(11,54,92,.22); }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-preview-hero.contrast-strong { background: linear-gradient(135deg, rgba(4,31,53,.96), rgba(13,86,130,.94)); text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-preview-hero.contrast-medium { background: linear-gradient(135deg, rgba(11,54,92,.9), rgba(38,115,172,.9)); }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-preview-hero .eyebrow { margin:0 0 8px; text-transform:uppercase; letter-spacing:.08em; font-size:11px; font-weight:950; opacity:.82; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-preview-hero h4 { margin:0 0 8px; font-size: var(--se-pw-headline-size,26px); line-height:1.08; color:#fff; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-preview-hero p { margin:0 0 14px; color:rgba(255,255,255,.90); font-size: var(--se-pw-body-size,14px); }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-actions { display:flex; flex-wrap:wrap; gap:8px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-actions a { display:inline-flex; align-items:center; justify-content:center; padding:10px 13px; border-radius: var(--se-pw-button-radius,999px); background:#fff; color:#0b365c; text-decoration:none; font-size:12px; font-weight:950; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-actions a.secondary { background:rgba(255,255,255,.13); color:#fff; border:1px solid rgba(255,255,255,.34); }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-mini-grid { display:grid; grid-template-columns: repeat(var(--se-pw-cols,3),minmax(0,1fr)); gap:10px; margin-top:12px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-mini-card { border-radius: var(--se-pw-card-radius,14px); padding: var(--se-pw-card-pad,12px); background:#fff; color:#102f4a; box-shadow: var(--se-pw-card-shadow,0 10px 22px rgba(11,54,92,.12)); min-height:70px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-mini-card strong { display:block; font-size:13px; margin-bottom:4px; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-mini-card span { display:block; font-size:12px; line-height:1.35; color:#536678; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-json { max-height:220px; overflow:auto; background:#091c2d; color:#d9fff1; border-radius:14px; padding:12px; font-size:11px; line-height:1.45; white-space:pre-wrap; }
+      .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-status { margin-top:10px; font-size:12px; color:#245c34; font-weight:900; }
+      .syncetc-homepage-v2.has-se-background-underlay::after { opacity: max(var(--se-underlay-overlay-opacity, .55), .72) !important; background: rgba(246,250,252,.86) !important; }
+      @media (max-width: 980px) {
+        .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-grid { grid-template-columns:1fr; }
+        .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-preview-card { position:static; }
+        .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-controls { grid-template-columns:1fr; }
+        .syncetc-homepage-v2 #${WORKBENCH_ID} .se-pw-mini-grid { grid-template-columns:1fr; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  function applyStateToRoot(state) {
+    const r = root();
+    if (!r) return;
+    r.classList.toggle("se-simplified-prototype", !!state.compactMode);
+    const themeMap = {
+      blue: ["#0b5a8f", "#184c70"],
+      slate: ["#344b5e", "#607080"],
+      sand: ["#806332", "#b08a43"],
+      airfield: ["#275c36", "#6f8f4f"]
+    };
+    const pair = themeMap[state.theme] || themeMap.blue;
+    r.style.setProperty("--se-pw-primary", pair[0]);
+    r.style.setProperty("--se-pw-secondary", pair[1]);
+    r.style.setProperty("--se-pw-headline-size", state.fontScale === "large" ? "30px" : state.fontScale === "small" ? "22px" : "26px");
+    r.style.setProperty("--se-pw-body-size", state.fontScale === "large" ? "15px" : state.fontScale === "small" ? "13px" : "14px");
+    r.style.setProperty("--se-pw-card-pad", state.density === "compact" ? "9px" : state.density === "spacious" ? "16px" : "12px");
+    r.style.setProperty("--se-pw-cols", state.density === "compact" ? "4" : "3");
+    r.style.setProperty("--se-pw-button-radius", state.buttonShape === "square" ? "8px" : state.buttonShape === "soft" ? "14px" : "999px");
+    r.style.setProperty("--se-pw-card-radius", state.cardStyle === "square" ? "8px" : state.cardStyle === "round" ? "18px" : "14px");
+    r.style.setProperty("--se-pw-card-shadow", state.cardStyle === "flat" ? "none" : "0 10px 22px rgba(11,54,92,.12)");
+  }
+  function field(kind, key, label, help, options) {
+    const state = readState();
+    const value = state[key];
+    if (kind === "textarea") return '<div><label>' + esc(label) + '</label><textarea data-se-pw-field="' + esc(key) + '">' + esc(value) + '</textarea><small>' + esc(help) + '</small></div>';
+    if (kind === "select") return '<div><label>' + esc(label) + '</label><select data-se-pw-field="' + esc(key) + '">' + (options || []).map(function (opt) { return '<option value="' + esc(opt[0]) + '"' + (String(value) === String(opt[0]) ? ' selected' : '') + '>' + esc(opt[1]) + '</option>'; }).join("") + '</select><small>' + esc(help) + '</small></div>';
+    if (kind === "checkbox") return '<label class="se-pw-toggle"><input type="checkbox" data-se-pw-field="' + esc(key) + '"' + (value ? ' checked' : '') + '> <span>' + esc(label) + '<small>' + esc(help) + '</small></span></label>';
+    return '<div><label>' + esc(label) + '</label><input type="text" data-se-pw-field="' + esc(key) + '" value="' + esc(value) + '"><small>' + esc(help) + '</small></div>';
+  }
+  function panelHtml(tab) {
+    if (tab === "style") return '<h3>Style controls</h3><p>Only wired controls are shown here. Color names avoid confusing aviation/land terminology.</p><div class="se-pw-controls">' +
+      field("select", "theme", "Theme preset", "Blue is the aviation-forward default.", [["blue","Aviation blue"],["airfield","Airfield green"],["slate","Neutral slate"],["sand","Warm sand"]]) +
+      field("select", "contrast", "Contrast protector", "Keeps text readable over customer images.", [["strong","Strong"],["medium","Medium"],["none","None"]]) +
+      field("select", "fontScale", "Font scale", "Visible in the live preview.", [["small","Small"],["normal","Normal"],["large","Large"]]) +
+      field("select", "density", "Card density", "Changes card padding and grid density.", [["compact","Compact"],["comfortable","Comfortable"],["spacious","Spacious"]]) +
+      field("select", "buttonShape", "Button shape", "Changes preview CTA shape.", [["pill","Pill"],["soft","Soft"],["square","Square"]]) +
+      field("select", "cardStyle", "Card style", "Changes card corners/shadow.", [["soft","Soft shadow"],["flat","Flat"],["round","Round"],["square","Square"]]) +
+    '</div>';
+    if (tab === "modules") return '<h3>Module visibility</h3><p>These toggles affect the compact preview below. Full production wiring comes later.</p><div class="se-pw-controls">' +
+      field("checkbox", "showGallery", "Show gallery card", "Visible in preview.") +
+      field("checkbox", "showAnnouncements", "Show announcements card", "Visible in preview.") +
+      field("checkbox", "showResources", "Show resources card", "Visible in preview.") +
+      field("checkbox", "showAdmin", "Show admin card", "Prototype-only preview.") +
+      field("checkbox", "compactMode", "Simplified page mode", "Hides lower informational preview sections.") +
+    '</div>';
+    if (tab === "export") return '<h3>Export and diagnostics</h3><p>This export downloads the local draft JSON. No Supabase write occurs yet.</p><div class="se-pw-controls">' +
+      field("checkbox", "compactMode", "Simplified page mode", "Keep only the primary testing area visible.") +
+      '<div><label>Version</label><input type="text" readonly value="' + esc(VERSION_LABEL) + '"><small>Frontend version currently loaded.</small></div>' +
+    '</div><div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;"><button type="button" class="se-pw-action primary" data-se-pw-action="export">Download local draft JSON</button><button type="button" class="se-pw-action" data-se-pw-action="reset">Reset local draft</button><button type="button" class="se-pw-action" data-se-pw-action="toggle-full">Toggle full prototype sections</button></div><div class="se-pw-status" data-se-pw-status></div><pre class="se-pw-json" data-se-pw-json></pre>';
+    return '<h3>Content controls</h3><p>Primary editable content is next to the preview. This replaces the lower prototype workspace for current testing.</p><div class="se-pw-controls">' +
+      field("text", "heroEyebrow", "Hero eyebrow", "Small label above headline.") +
+      field("text", "heroHeadline", "Hero headline", "Main homepage headline.") +
+      field("textarea", "heroSubheadline", "Hero subheadline", "Short paragraph under headline.") +
+      field("text", "primaryLabel", "Primary button label", "Main CTA.") +
+      field("text", "secondaryLabel", "Secondary button label", "Secondary CTA.") +
+    '</div>';
+  }
+  function previewHtml(state) {
+    const cards = [];
+    if (state.showGallery) cards.push(["Gallery", "Featured photos or customer media."]);
+    if (state.showAnnouncements) cards.push(["Announcements", "Current alerts and notices."]);
+    if (state.showResources) cards.push(["Resources", "Docs, links, and useful pages."]);
+    if (state.showAdmin) cards.push(["Admin", "Prototype-only admin visibility."]);
+    return '<div class="se-pw-preview-card"><div class="se-pw-preview-hero contrast-' + esc(state.contrast || "strong") + '"><p class="eyebrow">' + esc(state.heroEyebrow) + '</p><h4>' + esc(state.heroHeadline) + '</h4><p>' + esc(state.heroSubheadline) + '</p><div class="se-pw-actions"><a href="#">' + esc(state.primaryLabel) + '</a><a class="secondary" href="#">' + esc(state.secondaryLabel) + '</a></div></div><div class="se-pw-mini-grid">' + cards.map(function (card) { return '<div class="se-pw-mini-card"><strong>' + esc(card[0]) + '</strong><span>' + esc(card[1]) + '</span></div>'; }).join("") + '</div><div style="margin-top:10px;font-size:12px;font-weight:900;color:#536678;">Powered by SyncEtc · compact local preview</div></div>';
+  }
+  function renderWorkbench() {
+    const r = root();
+    if (!r) return;
+    const shell = r.querySelector(".se-shell") || r;
+    let wb = document.getElementById(WORKBENCH_ID);
+    if (!wb) {
+      wb = document.createElement("section");
+      wb.id = WORKBENCH_ID;
+      wb.setAttribute("data-se-priority-workbench", "");
+      const status = r.querySelector(".se-status") || r.querySelector("[data-se-status]");
+      if (status && status.parentNode) status.insertAdjacentElement("afterend", wb);
+      else shell.insertBefore(wb, shell.firstChild);
+    }
+    const state = readState();
+    applyStateToRoot(state);
+    wb.innerHTML = '<div class="se-pw-head"><div><div class="se-pw-kicker">Priority testing area</div><h2>Compact Admin Controls Workbench</h2><p>Reduced page surface for faster testing. Controls and preview stay together near the top.</p></div><div class="se-pw-badges"><span>JS v21</span><span>compact mode ' + (state.compactMode ? 'on' : 'off') + '</span><span>local export only</span></div></div>' +
+      '<div class="se-pw-tabs"><button class="se-pw-tab" data-se-pw-tab="content">Content</button><button class="se-pw-tab" data-se-pw-tab="style">Style</button><button class="se-pw-tab" data-se-pw-tab="modules">Modules</button><button class="se-pw-tab" data-se-pw-tab="export">Export</button></div>' +
+      '<div class="se-pw-grid"><div class="se-pw-panel" data-se-pw-panel></div><div class="se-pw-panel"><h3>Live compact preview</h3><p>Preview is intentionally beside the active controls.</p><div data-se-pw-preview></div></div></div>';
+    updateWorkbench(state.tab || "content");
+  }
+  function updateWorkbench(tab) {
+    const wb = document.getElementById(WORKBENCH_ID);
+    if (!wb) return;
+    const state = readState();
+    state.tab = tab;
+    writeState(state);
+    applyStateToRoot(state);
+    wb.querySelectorAll("[data-se-pw-tab]").forEach(function (btn) { btn.classList.toggle("is-active", btn.getAttribute("data-se-pw-tab") === tab); });
+    const panel = wb.querySelector("[data-se-pw-panel]");
+    const preview = wb.querySelector("[data-se-pw-preview]");
+    if (panel) panel.innerHTML = panelHtml(tab);
+    if (preview) preview.innerHTML = previewHtml(state);
+    const json = wb.querySelector("[data-se-pw-json]");
+    if (json) json.textContent = JSON.stringify({ version: VERSION_LABEL, cache_buster: CACHE_BUSTER, local_draft: state }, null, 2);
+  }
+  function setVersionMarkers() {
+    const r = root();
+    if (r) {
+      r.setAttribute("data-syncetc-js-version", VERSION_LABEL);
+      r.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
+    }
+    document.querySelectorAll("[data-syncetc-version]").forEach(function (el) {
+      const suffix = el.id === "syncetc-visible-version-badge" ? " loaded" : " loaded " + CACHE_BUSTER;
+      el.textContent = VERSION_LABEL + suffix;
+      el.setAttribute("data-syncetc-version", VERSION_LABEL);
+      el.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
+    });
+  }
+  function bindOnce() {
+    if (document.documentElement.getAttribute("data-se-update-93-bound") === "true") return;
+    document.documentElement.setAttribute("data-se-update-93-bound", "true");
+    document.addEventListener("click", function (event) {
+      const tab = event.target.closest("[data-se-pw-tab]");
+      if (tab) { updateWorkbench(tab.getAttribute("data-se-pw-tab")); return; }
+      const action = event.target.closest("[data-se-pw-action]");
+      if (!action) return;
+      const state = readState();
+      const kind = action.getAttribute("data-se-pw-action");
+      if (kind === "export") {
+        const payload = { export_type: "syncetc_priority_workbench_local_draft", version: VERSION_LABEL, exported_at: new Date().toISOString(), draft: state };
+        downloadJson("syncetc-priority-workbench-local-draft-" + timestamp() + ".json", payload);
+        const status = document.querySelector("[data-se-pw-status]");
+        if (status) status.textContent = "JSON downloaded locally. No production save occurred.";
+        updateWorkbench("export");
+      }
+      if (kind === "reset") {
+        try { window.localStorage.removeItem(STORAGE_KEY); } catch (error) {}
+        updateWorkbench("content");
+      }
+      if (kind === "toggle-full") {
+        state.compactMode = !state.compactMode;
+        writeState(state);
+        updateWorkbench("export");
+      }
+    }, true);
+    document.addEventListener("input", function (event) {
+      const field = event.target.closest("[data-se-pw-field]");
+      if (!field) return;
+      const state = readState();
+      const key = field.getAttribute("data-se-pw-field");
+      state[key] = field.type === "checkbox" ? field.checked : field.value;
+      writeState(state);
+      updateWorkbench(state.tab || "content");
+    });
+    document.addEventListener("change", function (event) {
+      const field = event.target.closest("[data-se-pw-field]");
+      if (!field) return;
+      const state = readState();
+      const key = field.getAttribute("data-se-pw-field");
+      state[key] = field.type === "checkbox" ? field.checked : field.value;
+      writeState(state);
+      updateWorkbench(state.tab || "content");
+    });
+  }
+  function runOnce() {
+    injectStyles();
+    setVersionMarkers();
+    renderWorkbench();
+  }
+  function boot() {
+    bindOnce();
+    runOnce();
+    [150, 450, 900, 1600, 2600, 4200].forEach(function (delay) { window.setTimeout(runOnce, delay); });
+    console.log("SYNCETC UPDATE 93 PRIORITY TEST WORKBENCH LOADED", VERSION_LABEL, CACHE_BUSTER);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+/* syncetc_update_93_simplified_priority_test_workbench - END */
+
 /* syncetc-homepage-current-all-in-one.js - END */
