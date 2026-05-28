@@ -1,7 +1,7 @@
 /* syncetc-homepage-current-all-in-one.js - BEGIN */
 /*
   Hosted SyncEtc Webflow asset.
-  Update 89 / v17: homepage admin editing workspace preview.
+  Update 90 / v18: expanded homepage admin workspace plus master controls test lab.
   Upload this single file to the current hosted root file for now:
   syncetc-homepage-current-all-in-one.js
 
@@ -1338,83 +1338,401 @@
 })();
 /* syncetc_update_89_admin_edit_workspace_styles - END */
 
-/* syncetc_current_visible_asset_version_badge_v17_admin_edit_workspace - BEGIN */
+
+/* syncetc_update_90_big_admin_controls_lab - BEGIN */
 (function () {
-  const VERSION_LABEL = "SyncEtc Hosted JS v17-admin-edit-workspace";
-  const CACHE_BUSTER = "?v=17-admin-edit-workspace";
   const ROOT_ID = "syncetc-generated-homepage-v2";
-  const TOP_BAR_ID = "syncetc-hosted-version-topbar";
-  const FLOAT_BADGE_ID = "syncetc-visible-version-badge";
+  const STYLE_ID = "syncetc-update-90-big-admin-controls-lab-style";
+  const LAB_ID = "syncetc-master-controls-test-lab";
+  const VERSION_LABEL = "SyncEtc Hosted JS v18-admin-controls-lab";
+  const CACHE_BUSTER = "?v=18-admin-controls-lab";
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function installStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent = `
+      .syncetc-homepage-v2 {
+        --se-lab-primary:#12351f;
+        --se-lab-accent:#75b66a;
+        --se-lab-bg:#f5f8f4;
+        --se-lab-card:#ffffff;
+        --se-lab-radius:18px;
+        --se-lab-font-scale:1;
+        --se-lab-density:1;
+        --se-lab-shadow:0 16px 36px rgba(18,53,31,.12);
+        --se-lab-max-width:980px;
+      }
+      .syncetc-homepage-v2.se-lab-theme-navy { --se-lab-primary:#0f2942; --se-lab-accent:#7db7d8; --se-lab-bg:#eef5fa; }
+      .syncetc-homepage-v2.se-lab-theme-slate { --se-lab-primary:#27323a; --se-lab-accent:#9ba8b1; --se-lab-bg:#f1f4f6; }
+      .syncetc-homepage-v2.se-lab-theme-sand { --se-lab-primary:#795119; --se-lab-accent:#d0a24a; --se-lab-bg:#fbf5e9; }
+      .syncetc-homepage-v2.se-lab-width-narrow { --se-lab-max-width:860px; }
+      .syncetc-homepage-v2.se-lab-width-normal { --se-lab-max-width:980px; }
+      .syncetc-homepage-v2.se-lab-width-wide { --se-lab-max-width:1180px; }
+      .syncetc-homepage-v2.se-lab-density-compact { --se-lab-density:.82; }
+      .syncetc-homepage-v2.se-lab-density-comfortable { --se-lab-density:1; }
+      .syncetc-homepage-v2.se-lab-density-spacious { --se-lab-density:1.18; }
+      .syncetc-homepage-v2.se-lab-radius-square { --se-lab-radius:6px; }
+      .syncetc-homepage-v2.se-lab-radius-soft { --se-lab-radius:18px; }
+      .syncetc-homepage-v2.se-lab-radius-round { --se-lab-radius:30px; }
+      .syncetc-homepage-v2.se-lab-shadow-none { --se-lab-shadow:none; }
+      .syncetc-homepage-v2.se-lab-shadow-soft { --se-lab-shadow:0 16px 36px rgba(18,53,31,.12); }
+      .syncetc-homepage-v2.se-lab-shadow-strong { --se-lab-shadow:0 22px 60px rgba(18,53,31,.24); }
+      .se-master-controls-lab { max-width:var(--se-lab-max-width); margin:18px auto; border:1px solid rgba(18,53,31,.14); border-radius:22px; background:rgba(255,255,255,.90); box-shadow:var(--se-lab-shadow); overflow:hidden; font-size:calc(14px * var(--se-lab-font-scale)); }
+      .se-master-lab-head { padding:calc(16px * var(--se-lab-density)) calc(18px * var(--se-lab-density)); background:linear-gradient(135deg, var(--se-lab-primary), #234c2f); color:#fff; display:flex; justify-content:space-between; gap:16px; align-items:flex-start; }
+      .se-master-lab-head h2 { margin:0 0 4px; font-size:20px; letter-spacing:.01em; }
+      .se-master-lab-head p { margin:0; max-width:760px; opacity:.88; line-height:1.35; }
+      .se-master-lab-badges { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:6px; min-width:180px; }
+      .se-master-lab-badges span { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); border-radius:999px; padding:6px 8px; font-size:11px; font-weight:900; white-space:nowrap; }
+      .se-master-lab-tabs { display:flex; gap:8px; flex-wrap:wrap; padding:12px 14px; border-bottom:1px solid rgba(18,53,31,.12); background:var(--se-lab-bg); }
+      .se-master-lab-tab { border:1px solid rgba(18,53,31,.18); border-radius:999px; padding:8px 11px; background:#fff; color:var(--se-lab-primary); font-weight:900; cursor:pointer; }
+      .se-master-lab-tab.is-active { background:var(--se-lab-primary); color:#fff; }
+      .se-master-lab-body { display:grid; grid-template-columns:minmax(0, 1.05fr) minmax(320px, .95fr); gap:14px; padding:14px; }
+      .se-master-lab-panel { border:1px solid rgba(18,53,31,.12); border-radius:18px; background:#fff; padding:calc(12px * var(--se-lab-density)); }
+      .se-master-lab-panel h3 { margin:0 0 4px; color:var(--se-lab-primary); font-size:15px; }
+      .se-master-lab-panel p { margin:0 0 10px; color:#50605a; line-height:1.35; }
+      .se-master-control-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
+      .se-master-control { border:1px solid rgba(18,53,31,.10); border-radius:14px; background:#fbfcfb; padding:10px; }
+      .se-master-control label { display:block; margin-bottom:6px; color:var(--se-lab-primary); font-weight:900; font-size:12px; }
+      .se-master-control small { display:block; margin-top:5px; color:#64736d; font-size:11px; line-height:1.25; }
+      .se-master-control input[type="text"], .se-master-control input[type="url"], .se-master-control select, .se-master-control textarea { width:100%; box-sizing:border-box; border:1px solid rgba(18,53,31,.18); border-radius:12px; padding:8px 9px; color:#12351f; background:#fff; font:inherit; }
+      .se-master-control textarea { min-height:70px; resize:vertical; }
+      .se-master-toggle-row { display:flex; align-items:center; gap:8px; padding:7px 0; color:#12351f; font-weight:850; }
+      .se-master-preview-shell { border-radius:var(--se-lab-radius); border:1px solid rgba(18,53,31,.13); background:var(--se-lab-bg); padding:14px; min-height:420px; }
+      .se-master-preview-hero { border-radius:var(--se-lab-radius); background:linear-gradient(135deg, var(--se-lab-primary), #3d6e46); color:#fff; padding:calc(20px * var(--se-lab-density)); box-shadow:var(--se-lab-shadow); }
+      .se-master-preview-hero .eyebrow { margin:0 0 6px; color:rgba(255,255,255,.75); font-weight:900; text-transform:uppercase; letter-spacing:.06em; font-size:11px; }
+      .se-master-preview-hero h4 { margin:0 0 8px; font-size:calc(22px * var(--se-lab-font-scale)); }
+      .se-master-preview-hero p { margin:0 0 14px; color:rgba(255,255,255,.85); line-height:1.4; }
+      .se-master-preview-actions { display:flex; gap:8px; flex-wrap:wrap; }
+      .se-master-preview-actions a { display:inline-flex; text-decoration:none; border-radius:999px; padding:9px 12px; font-weight:900; background:#fff; color:var(--se-lab-primary); border:1px solid rgba(255,255,255,.38); }
+      .se-master-preview-actions a.secondary { background:rgba(255,255,255,.12); color:#fff; }
+      .syncetc-homepage-v2.se-lab-button-square .se-master-preview-actions a { border-radius:7px; }
+      .syncetc-homepage-v2.se-lab-button-soft .se-master-preview-actions a { border-radius:14px; }
+      .syncetc-homepage-v2.se-lab-button-pill .se-master-preview-actions a { border-radius:999px; }
+      .se-master-preview-card-grid { display:grid; gap:10px; grid-template-columns:repeat(var(--se-lab-card-cols,3), minmax(0,1fr)); margin-top:12px; }
+      .se-master-preview-card { border-radius:var(--se-lab-radius); background:#fff; border:1px solid rgba(18,53,31,.12); padding:12px; box-shadow:var(--se-lab-shadow); color:#12351f; }
+      .se-master-preview-card strong { display:block; color:var(--se-lab-primary); margin-bottom:4px; }
+      .se-master-preview-card span { color:#5b6b63; font-size:12px; line-height:1.3; }
+      .se-master-output { white-space:pre-wrap; max-height:220px; overflow:auto; font-size:11px; background:#10291a; color:#e5f3e8; padding:10px; border-radius:14px; margin-top:10px; }
+      .se-master-lab-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+      .se-master-lab-actions button { border:1px solid rgba(18,53,31,.18); background:var(--se-lab-primary); color:#fff; border-radius:999px; padding:8px 11px; font-weight:900; cursor:pointer; }
+      .se-master-lab-actions button.secondary { background:#fff; color:var(--se-lab-primary); }
+      .se-master-lab-warning { margin:10px 14px 14px; padding:10px 12px; border:1px dashed rgba(121,81,25,.45); border-radius:14px; background:#fff9ef; color:#795119; font-weight:850; font-size:12px; }
+      @media (max-width:900px) { .se-master-lab-body { grid-template-columns:1fr; } .se-master-control-grid { grid-template-columns:1fr; } .se-master-preview-card-grid { grid-template-columns:1fr; } }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function defaultsFromPage() {
+    const title = (document.querySelector('.se-admin-editing-workspace input[value]') || {}).value || "150th Aero homepage draft controls";
+    return {
+      labTab: "theme",
+      theme: "green",
+      width: "normal",
+      density: "comfortable",
+      radius: "soft",
+      shadow: "soft",
+      buttonShape: "pill",
+      fontScale: "1",
+      cardColumns: "3",
+      heroSize: "medium",
+      heroEyebrow: "Aviation club operations",
+      heroHeadline: title,
+      heroSubheadline: "Preview safe, bounded controls before they become customer-facing settings.",
+      primaryLabel: "View dashboard",
+      secondaryLabel: "Contact us",
+      showPrimary: true,
+      showSecondary: true,
+      showGallery: true,
+      showAnnouncements: true,
+      showAdminNav: false,
+      showPoweredBy: true,
+      backgroundMode: "image-muted",
+      metadataTitle: "Home | SyncEtc Customer Site",
+      navStyle: "grouped",
+      customerFacing: "selected",
+      builderOnly: "advanced"
+    };
+  }
+
+  function readState() {
+    const root = document.getElementById(ROOT_ID);
+    const raw = root && root.getAttribute("data-se-lab-state");
+    if (raw) {
+      try { return Object.assign(defaultsFromPage(), JSON.parse(raw)); } catch (error) {}
+    }
+    return defaultsFromPage();
+  }
+
+  function writeState(state) {
+    const root = document.getElementById(ROOT_ID);
+    if (root) root.setAttribute("data-se-lab-state", JSON.stringify(state));
+    try { window.localStorage.setItem("syncetc_master_controls_lab_state", JSON.stringify(state)); } catch (error) {}
+  }
+
+  function applyState(state) {
+    const root = document.getElementById(ROOT_ID);
+    if (!root) return;
+    const classGroups = [
+      "se-lab-theme-green","se-lab-theme-navy","se-lab-theme-slate","se-lab-theme-sand",
+      "se-lab-width-narrow","se-lab-width-normal","se-lab-width-wide",
+      "se-lab-density-compact","se-lab-density-comfortable","se-lab-density-spacious",
+      "se-lab-radius-square","se-lab-radius-soft","se-lab-radius-round",
+      "se-lab-shadow-none","se-lab-shadow-soft","se-lab-shadow-strong",
+      "se-lab-button-square","se-lab-button-soft","se-lab-button-pill"
+    ];
+    root.classList.remove.apply(root.classList, classGroups);
+    root.classList.add("se-lab-theme-" + state.theme);
+    root.classList.add("se-lab-width-" + state.width);
+    root.classList.add("se-lab-density-" + state.density);
+    root.classList.add("se-lab-radius-" + state.radius);
+    root.classList.add("se-lab-shadow-" + state.shadow);
+    root.classList.add("se-lab-button-" + state.buttonShape);
+    root.style.setProperty("--se-lab-font-scale", state.fontScale || "1");
+    root.style.setProperty("--se-lab-card-cols", state.cardColumns || "3");
+    writeState(state);
+  }
+
+  function field(kind, key, label, help, options) {
+    const state = readState();
+    const value = state[key];
+    if (kind === "textarea") {
+      return '<div class="se-master-control"><label for="se-lab-' + key + '">' + escapeHtml(label) + '</label><textarea id="se-lab-' + key + '" data-se-lab-field="' + key + '">' + escapeHtml(value) + '</textarea><small>' + escapeHtml(help) + '</small></div>';
+    }
+    if (kind === "select") {
+      const opts = (options || []).map(function (item) {
+        return '<option value="' + escapeHtml(item[0]) + '"' + (String(value) === String(item[0]) ? ' selected' : '') + '>' + escapeHtml(item[1]) + '</option>';
+      }).join('');
+      return '<div class="se-master-control"><label for="se-lab-' + key + '">' + escapeHtml(label) + '</label><select id="se-lab-' + key + '" data-se-lab-field="' + key + '">' + opts + '</select><small>' + escapeHtml(help) + '</small></div>';
+    }
+    if (kind === "checkbox") {
+      return '<label class="se-master-toggle-row"><input type="checkbox" data-se-lab-field="' + key + '"' + (value ? ' checked' : '') + '> ' + escapeHtml(label) + '</label>';
+    }
+    const inputType = kind === "url" ? "url" : "text";
+    return '<div class="se-master-control"><label for="se-lab-' + key + '">' + escapeHtml(label) + '</label><input type="' + inputType + '" id="se-lab-' + key + '" data-se-lab-field="' + key + '" value="' + escapeHtml(value) + '"><small>' + escapeHtml(help) + '</small></div>';
+  }
+
+  function panelHtml(tab) {
+    const themeOptions = [["green","Aviation green"],["navy","Navy operations"],["slate","Neutral slate"],["sand","Warm sand"]];
+    const widthOptions = [["narrow","Narrow"],["normal","Normal"],["wide","Wide"]];
+    const densityOptions = [["compact","Compact"],["comfortable","Comfortable"],["spacious","Spacious"]];
+    const radiusOptions = [["square","Square"],["soft","Soft"],["round","Round"]];
+    const shadowOptions = [["none","None"],["soft","Soft"],["strong","Strong"]];
+    const shapeOptions = [["square","Square"],["soft","Soft"],["pill","Pill"]];
+    const scaleOptions = [["0.92","Small"],["1","Normal"],["1.08","Large"],["1.16","Extra large"]];
+    const columnsOptions = [["2","2 columns"],["3","3 columns"],["4","4 columns"]];
+    const heroSizeOptions = [["small","Small"],["medium","Medium"],["large","Large"]];
+    const navOptions = [["row","Simple row"],["grouped","Grouped"],["dropdowns","Grouped dropdowns"]];
+
+    if (tab === "content") {
+      return '<h3>Homepage content controls</h3><p>Draft visible home-page copy and calls to action without touching production publish logic.</p><div class="se-master-control-grid">' +
+        field("text", "heroEyebrow", "Hero eyebrow", "Small label above the main headline.") +
+        field("text", "heroHeadline", "Hero headline", "Main homepage headline.") +
+        field("textarea", "heroSubheadline", "Hero subheadline", "Short paragraph under the headline.") +
+        field("text", "primaryLabel", "Primary button label", "Main CTA label.") +
+        field("text", "secondaryLabel", "Secondary button label", "Secondary CTA label.") +
+        field("select", "heroSize", "Hero size", "Bounded hero height choice.", heroSizeOptions) +
+      '</div>';
+    }
+    if (tab === "layout") {
+      return '<h3>Layout and component controls</h3><p>Safe layout controls use bounded choices instead of arbitrary destructive values.</p><div class="se-master-control-grid">' +
+        field("select", "width", "Page width", "Narrow, normal, or wide container.", widthOptions) +
+        field("select", "density", "Density", "Compact or spacious component padding.", densityOptions) +
+        field("select", "radius", "Card radius", "Controls card corner treatment.", radiusOptions) +
+        field("select", "shadow", "Shadow strength", "Controls visual depth.", shadowOptions) +
+        field("select", "cardColumns", "Card columns", "Preview 2, 3, or 4 columns.", columnsOptions) +
+        field("select", "fontScale", "Font scale", "Bounded page text scale.", scaleOptions) +
+      '</div>';
+    }
+    if (tab === "buttons") {
+      return '<h3>Button and navigation controls</h3><p>Preview button style, CTA visibility, and menu presentation rules.</p><div class="se-master-control-grid">' +
+        field("select", "buttonShape", "Button shape", "Square, soft, or pill buttons.", shapeOptions) +
+        field("select", "navStyle", "Navigation style", "Future menu rendering model.", navOptions) +
+        '<div class="se-master-control"><label>CTA visibility</label>' + field("checkbox", "showPrimary", "Show primary CTA", "") + field("checkbox", "showSecondary", "Show secondary CTA", "") + '</div>' +
+        '<div class="se-master-control"><label>Navigation visibility</label>' + field("checkbox", "showAdminNav", "Show admin nav in preview", "") + field("checkbox", "showPoweredBy", "Show Powered by SyncEtc", "") + '</div>' +
+      '</div>';
+    }
+    if (tab === "modules") {
+      return '<h3>Module visibility controls</h3><p>Prototype how customers or builders turn sections on and off without deleting data.</p><div class="se-master-control-grid">' +
+        '<div class="se-master-control"><label>Homepage modules</label>' + field("checkbox", "showGallery", "Show gallery feature", "") + field("checkbox", "showAnnouncements", "Show announcements", "") + '</div>' +
+        field("select", "customerFacing", "Customer-facing controls", "Which controls can customer admins see.", [["minimal","Minimal"],["selected","Selected safe controls"],["expanded","Expanded safe controls"]]) +
+        field("select", "builderOnly", "Builder-only controls", "Which controls remain SyncEtc/builder only.", [["basic","Basic"],["advanced","Advanced"],["platform","Platform only"]]) +
+        field("select", "backgroundMode", "Background treatment", "Safe background/underlay handling.", [["none","None"],["image-muted","Muted image"],["color-soft","Soft color"],["pattern","Pattern placeholder"]]) +
+      '</div>';
+    }
+    if (tab === "metadata") {
+      return '<h3>Page metadata and publishing controls</h3><p>Preview metadata and eventual publish-state concepts. Publishing remains disabled in this prototype.</p><div class="se-master-control-grid">' +
+        field("text", "metadataTitle", "Browser title", "Future page title/SEO/browser title control.") +
+        field("text", "heroHeadline", "Draft page name", "Reusable value shown in the preview.") +
+      '</div><div class="se-master-lab-actions"><button type="button" data-se-lab-action="export">Export draft JSON</button><button type="button" class="secondary" data-se-lab-action="reset">Reset local lab</button></div><pre class="se-master-output" data-se-lab-output></pre>';
+    }
+    return '<h3>Theme controls</h3><p>Preview high-level brand styling without allowing destructive arbitrary CSS.</p><div class="se-master-control-grid">' +
+      field("select", "theme", "Theme preset", "Bounded brand palette choice.", themeOptions) +
+      field("select", "backgroundMode", "Background mode", "Future Supabase asset/background handling.", [["none","None"],["image-muted","Muted image"],["color-soft","Soft color"],["pattern","Pattern placeholder"]]) +
+      field("select", "fontScale", "Font scale", "Bounded type scale.", scaleOptions) +
+      field("select", "shadow", "Shadow", "Depth preset.", shadowOptions) +
+    '</div>';
+  }
+
+  function previewHtml(state) {
+    const cards = [];
+    if (state.showGallery) cards.push(["Gallery", "Featured media and rotating visual modules."]);
+    if (state.showAnnouncements) cards.push(["Announcements", "Current notices, alerts, and homepage strips."]);
+    cards.push(["Resources", "Documents, links, and customer-specific sections."]);
+    if (state.showAdminNav) cards.push(["Admin", "Admin navigation visible in this preview only."]);
+    const cardHtml = cards.map(function (card) {
+      return '<div class="se-master-preview-card"><strong>' + escapeHtml(card[0]) + '</strong><span>' + escapeHtml(card[1]) + '</span></div>';
+    }).join('');
+    return '<div class="se-master-preview-shell"><div class="se-master-preview-hero"><p class="eyebrow">' + escapeHtml(state.heroEyebrow) + '</p><h4>' + escapeHtml(state.heroHeadline) + '</h4><p>' + escapeHtml(state.heroSubheadline) + '</p><div class="se-master-preview-actions">' +
+      (state.showPrimary ? '<a href="#">' + escapeHtml(state.primaryLabel) + '</a>' : '') +
+      (state.showSecondary ? '<a class="secondary" href="#">' + escapeHtml(state.secondaryLabel) + '</a>' : '') +
+      '</div></div><div class="se-master-preview-card-grid">' + cardHtml + '</div>' +
+      (state.showPoweredBy ? '<div style="margin-top:10px;color:#50605a;font-weight:800;font-size:12px;">Powered by SyncEtc · preview only</div>' : '') +
+      '</div>';
+  }
+
+  function renderLab() {
+    const root = document.getElementById(ROOT_ID);
+    if (!root || document.getElementById(LAB_ID)) return;
+    let saved = null;
+    try { saved = JSON.parse(window.localStorage.getItem("syncetc_master_controls_lab_state") || "null"); } catch (error) {}
+    const state = Object.assign(defaultsFromPage(), saved || {});
+    applyState(state);
+
+    const lab = document.createElement("section");
+    lab.id = LAB_ID;
+    lab.className = "se-master-controls-lab";
+    lab.setAttribute("data-se-master-controls", "");
+    lab.innerHTML = '<div class="se-master-lab-head"><div><h2>Master Variables / Controls Test Lab</h2><p>Large prototype workspace for testing customer-facing controls, builder-only controls, style variables, module visibility, buttons, cards, metadata, and future save/publish boundaries.</p></div><div class="se-master-lab-badges"><span>JS v18</span><span>local draft only</span><span>no production save</span></div></div>' +
+      '<div class="se-master-lab-tabs" data-se-lab-tabs>' +
+        '<button class="se-master-lab-tab" data-se-lab-tab="theme">Theme</button>' +
+        '<button class="se-master-lab-tab" data-se-lab-tab="content">Content</button>' +
+        '<button class="se-master-lab-tab" data-se-lab-tab="layout">Layout</button>' +
+        '<button class="se-master-lab-tab" data-se-lab-tab="buttons">Buttons/Nav</button>' +
+        '<button class="se-master-lab-tab" data-se-lab-tab="modules">Modules</button>' +
+        '<button class="se-master-lab-tab" data-se-lab-tab="metadata">Metadata/Export</button>' +
+      '</div>' +
+      '<div class="se-master-lab-body"><div class="se-master-lab-panel" data-se-lab-panel></div><div class="se-master-lab-panel"><h3>Live bounded-preview output</h3><p>This preview changes immediately, but no database write occurs here yet.</p><div data-se-lab-preview></div></div></div>' +
+      '<div class="se-master-lab-warning">Prototype boundary: this is intentionally a local draft test lab. The next production step is wiring controlled save actions to authenticated Supabase functions with customer scoping and audit logs.</div>';
+
+    const shell = root.querySelector(".se-shell") || root;
+    shell.appendChild(lab);
+    updateLab(lab, state.labTab || "theme");
+  }
+
+  function updateLab(lab, tab) {
+    const state = readState();
+    state.labTab = tab;
+    applyState(state);
+    lab.querySelectorAll('[data-se-lab-tab]').forEach(function (button) {
+      button.classList.toggle('is-active', button.getAttribute('data-se-lab-tab') === tab);
+    });
+    const panel = lab.querySelector('[data-se-lab-panel]');
+    const preview = lab.querySelector('[data-se-lab-preview]');
+    if (panel) panel.innerHTML = panelHtml(tab);
+    if (preview) preview.innerHTML = previewHtml(state);
+    const output = lab.querySelector('[data-se-lab-output]');
+    if (output) output.textContent = JSON.stringify(state, null, 2);
+  }
+
+  function bindLab() {
+    document.addEventListener('click', function (event) {
+      const tabButton = event.target.closest('[data-se-lab-tab]');
+      if (tabButton) {
+        const lab = document.getElementById(LAB_ID);
+        if (lab) updateLab(lab, tabButton.getAttribute('data-se-lab-tab'));
+        return;
+      }
+      const action = event.target.closest('[data-se-lab-action]');
+      if (action) {
+        const lab = document.getElementById(LAB_ID);
+        const state = readState();
+        if (action.getAttribute('data-se-lab-action') === 'reset') {
+          try { window.localStorage.removeItem('syncetc_master_controls_lab_state'); } catch (error) {}
+          applyState(defaultsFromPage());
+          if (lab) updateLab(lab, 'theme');
+        }
+        if (action.getAttribute('data-se-lab-action') === 'export') {
+          const output = lab && lab.querySelector('[data-se-lab-output]');
+          if (output) output.textContent = JSON.stringify(state, null, 2);
+        }
+      }
+    });
+
+    document.addEventListener('input', function (event) {
+      const fieldEl = event.target.closest('[data-se-lab-field]');
+      if (!fieldEl) return;
+      const key = fieldEl.getAttribute('data-se-lab-field');
+      const state = readState();
+      state[key] = fieldEl.type === 'checkbox' ? fieldEl.checked : fieldEl.value;
+      applyState(state);
+      const lab = document.getElementById(LAB_ID);
+      if (lab) updateLab(lab, state.labTab || 'theme');
+    });
+
+    document.addEventListener('change', function (event) {
+      const fieldEl = event.target.closest('[data-se-lab-field]');
+      if (!fieldEl) return;
+      const key = fieldEl.getAttribute('data-se-lab-field');
+      const state = readState();
+      state[key] = fieldEl.type === 'checkbox' ? fieldEl.checked : fieldEl.value;
+      applyState(state);
+      const lab = document.getElementById(LAB_ID);
+      if (lab) updateLab(lab, state.labTab || 'theme');
+    });
+  }
 
   function installVersionMarkers() {
-    if (!document.getElementById(TOP_BAR_ID)) {
-      const bar = document.createElement("div");
+    const TOP_BAR_ID = "syncetc-hosted-version-topbar";
+    const FLOAT_BADGE_ID = "syncetc-visible-version-badge";
+    let bar = document.getElementById(TOP_BAR_ID);
+    if (!bar) {
+      bar = document.createElement("div");
       bar.id = TOP_BAR_ID;
-      bar.textContent = VERSION_LABEL + " loaded " + CACHE_BUSTER;
-      bar.setAttribute("data-syncetc-version", VERSION_LABEL);
-      bar.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
-      bar.style.cssText = [
-        "display:block",
-        "width:100%",
-        "box-sizing:border-box",
-        "padding:10px 14px",
-        "margin:0",
-        "background:#12351f",
-        "color:#ffffff",
-        "font-family:Arial, sans-serif",
-        "font-size:13px",
-        "font-weight:900",
-        "letter-spacing:.03em",
-        "text-align:center",
-        "border-bottom:3px solid #75b66a",
-        "position:relative",
-        "z-index:999998"
-      ].join(";");
       document.body.insertBefore(bar, document.body.firstChild);
     }
+    bar.textContent = VERSION_LABEL + " loaded " + CACHE_BUSTER;
+    bar.setAttribute("data-syncetc-version", VERSION_LABEL);
+    bar.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
+    bar.style.cssText = "display:block;width:100%;box-sizing:border-box;padding:10px 14px;margin:0;background:#12351f;color:#ffffff;font-family:Arial,sans-serif;font-size:13px;font-weight:900;letter-spacing:.03em;text-align:center;border-bottom:3px solid #75b66a;position:relative;z-index:999998";
 
-    if (!document.getElementById(FLOAT_BADGE_ID)) {
-      const badge = document.createElement("div");
+    let badge = document.getElementById(FLOAT_BADGE_ID);
+    if (!badge) {
+      badge = document.createElement("div");
       badge.id = FLOAT_BADGE_ID;
-      badge.textContent = "JS v17 loaded";
-      badge.setAttribute("data-syncetc-version", VERSION_LABEL);
-      badge.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
-      badge.style.cssText = [
-        "position:fixed",
-        "right:12px",
-        "top:12px",
-        "z-index:999999",
-        "background:#12351f",
-        "color:#ffffff",
-        "font-family:Arial, sans-serif",
-        "font-size:12px",
-        "font-weight:900",
-        "letter-spacing:.02em",
-        "padding:8px 11px",
-        "border-radius:999px",
-        "box-shadow:0 8px 24px rgba(0,0,0,.24)",
-        "border:1px solid rgba(255,255,255,.55)",
-        "pointer-events:none"
-      ].join(";");
       document.body.appendChild(badge);
     }
-
+    badge.textContent = "JS v18 loaded";
+    badge.setAttribute("data-syncetc-version", VERSION_LABEL);
+    badge.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
+    badge.style.cssText = "position:fixed;right:12px;top:12px;z-index:999999;background:#12351f;color:#ffffff;font-family:Arial,sans-serif;font-size:12px;font-weight:900;letter-spacing:.02em;padding:8px 11px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.55);pointer-events:none";
     const root = document.getElementById(ROOT_ID);
     if (root) {
       root.setAttribute("data-syncetc-js-version", VERSION_LABEL);
       root.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
     }
-
-    console.log("SYNCETC HOSTED JS VERSION LOADED:", VERSION_LABEL, CACHE_BUSTER);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", installVersionMarkers);
-  } else {
+  function boot() {
+    installStyles();
     installVersionMarkers();
+    bindLab();
+    renderLab();
+    console.log("SYNCETC UPDATE 90 MASTER CONTROLS LAB LOADED", VERSION_LABEL, CACHE_BUSTER);
   }
-})();
-/* syncetc_current_visible_asset_version_badge_v17_admin_edit_workspace - END */
 
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+/* syncetc_update_90_big_admin_controls_lab - END */
 
 /* syncetc-homepage-current-all-in-one.js - END */
