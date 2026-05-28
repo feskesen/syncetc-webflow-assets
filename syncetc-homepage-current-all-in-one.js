@@ -2153,4 +2153,158 @@
 /* syncetc_update_92A_safe_draft_preview_export_patch - END */
 
 
+
+/* syncetc_update_92B_preview_position_fix - BEGIN */
+(function () {
+  const ROOT_ID = "syncetc-generated-homepage-v2";
+  const VERSION_LABEL = "JS v20B-preview-position";
+  const CACHE_BUSTER = "?v=20B-preview-position";
+  const LAB_IDS = ["syncetc-master-controls-test-lab", "syncetc-master-controls-lab"];
+
+  function root() { return document.getElementById(ROOT_ID); }
+
+  function findLab(r) {
+    for (let i = 0; i < LAB_IDS.length; i += 1) {
+      const el = document.getElementById(LAB_IDS[i]);
+      if (el) return el;
+    }
+    return r ? r.querySelector(".se-master-lab") : null;
+  }
+
+  function injectStyles() {
+    if (document.getElementById("syncetc-update-92B-preview-position-styles")) return;
+    const style = document.createElement("style");
+    style.id = "syncetc-update-92B-preview-position-styles";
+    style.textContent = `
+      .syncetc-homepage-v2 .se-admin-editing-preview {
+        border: 2px solid rgba(47,128,196,.28) !important;
+      }
+      .syncetc-homepage-v2 .se-admin-editing-title::after {
+        content: " · preview beside controls v20B" !important;
+        color: #2f80c4 !important;
+        font-size: 12px !important;
+        font-weight: 950 !important;
+      }
+      .syncetc-homepage-v2 .se-admin-workspace-draft-layout {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr) !important;
+        gap: 14px !important;
+        align-items: start !important;
+        margin-top: 12px !important;
+      }
+      .syncetc-homepage-v2 .se-admin-workspace-draft-layout > .se-admin-form-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+        gap: 12px !important;
+        margin-top: 0 !important;
+      }
+      .syncetc-homepage-v2 .se-admin-workspace-draft-layout > .se-admin-draft-preview {
+        margin-top: 0 !important;
+        position: sticky !important;
+        top: 18px !important;
+        align-self: start !important;
+        background: rgba(247,250,252,.98) !important;
+        border: 1px solid rgba(18,54,90,.18) !important;
+        border-radius: 16px !important;
+        padding: 12px !important;
+        box-shadow: 0 12px 26px rgba(18,54,90,.10) !important;
+      }
+      .syncetc-homepage-v2 .se-admin-workspace-draft-layout > .se-admin-draft-preview summary::after {
+        content: " - beside controls";
+        color: #2f80c4;
+        font-weight: 950;
+      }
+      .syncetc-homepage-v2 .se-admin-workspace-draft-layout > .se-admin-draft-preview pre {
+        max-height: 440px !important;
+        overflow: auto !important;
+        background: #0e2330 !important;
+        color: #ddf8e7 !important;
+        border-radius: 12px !important;
+        padding: 12px !important;
+        font-size: 11px !important;
+        line-height: 1.45 !important;
+      }
+      @media (max-width: 980px) {
+        .syncetc-homepage-v2 .se-admin-workspace-draft-layout {
+          grid-template-columns: 1fr !important;
+        }
+        .syncetc-homepage-v2 .se-admin-workspace-draft-layout > .se-admin-form-grid {
+          grid-template-columns: 1fr !important;
+        }
+        .syncetc-homepage-v2 .se-admin-workspace-draft-layout > .se-admin-draft-preview {
+          position: static !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function updateVersionMarkers() {
+    const r = root();
+    if (r) {
+      r.setAttribute("data-syncetc-js-version", VERSION_LABEL);
+      r.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
+    }
+    document.querySelectorAll("[data-syncetc-version]").forEach(function (el) {
+      const suffix = el.classList && el.classList.contains("se-js-version-badge") ? " loaded" : " loaded " + CACHE_BUSTER;
+      el.textContent = VERSION_LABEL + suffix;
+      el.setAttribute("data-syncetc-version", VERSION_LABEL);
+      el.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
+    });
+    document.querySelectorAll(".se-master-lab-badges span, .se-admin-editing-pill").forEach(function (span) {
+      if (/JS v\d+/i.test(span.textContent)) span.textContent = "JS v20B";
+    });
+  }
+
+  function moveAdminWorkspaceHigh() {
+    const r = root();
+    if (!r) return;
+    const workspaceWrap = r.querySelector("[data-se-admin-editing-preview]");
+    const lab = findLab(r);
+    if (!workspaceWrap || !lab || !lab.parentNode) return;
+    if (lab.nextSibling !== workspaceWrap) {
+      lab.parentNode.insertBefore(workspaceWrap, lab.nextSibling);
+    }
+  }
+
+  function putPreviewBesideControls() {
+    const r = root();
+    if (!r) return;
+    const workspace = r.querySelector(".se-admin-editing-workspace");
+    if (!workspace) return;
+    const grid = workspace.querySelector(".se-admin-form-grid");
+    const preview = workspace.querySelector(".se-admin-draft-preview");
+    if (!grid || !preview || !grid.parentNode) return;
+
+    let layout = workspace.querySelector(".se-admin-workspace-draft-layout");
+    if (!layout) {
+      layout = document.createElement("div");
+      layout.className = "se-admin-workspace-draft-layout";
+      grid.parentNode.insertBefore(layout, grid);
+    }
+    if (grid.parentNode !== layout) layout.appendChild(grid);
+    if (preview.parentNode !== layout) layout.appendChild(preview);
+  }
+
+  function runOnce() {
+    injectStyles();
+    updateVersionMarkers();
+    moveAdminWorkspaceHigh();
+    putPreviewBesideControls();
+  }
+
+  function boot() {
+    runOnce();
+    [120, 350, 700, 1200, 2000, 3200, 5000].forEach(function (delay) {
+      window.setTimeout(runOnce, delay);
+    });
+    console.log("SYNCETC UPDATE 92B PREVIEW POSITION PATCH LOADED", VERSION_LABEL, CACHE_BUSTER);
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+/* syncetc_update_92B_preview_position_fix - END */
+
+
 /* syncetc-homepage-current-all-in-one.js - END */
