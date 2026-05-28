@@ -1239,4 +1239,54 @@
 })();
 /* syncetc_current_public_preview_mode_toggle_v14 - END */
 
+/* syncetc_current_visible_asset_version_badge_v15_version_badge - BEGIN */
+(function () {
+  const VERSION_LABEL = "SyncEtc JS v15-version-badge";
+  const CACHE_BUSTER = "?v=15-version-badge";
+  const ROOT_ID = "syncetc-generated-homepage-v2";
+
+  function installBadge() {
+    if (document.getElementById("syncetc-visible-version-badge")) return;
+
+    const badge = document.createElement("div");
+    badge.id = "syncetc-visible-version-badge";
+    badge.textContent = VERSION_LABEL + " loaded " + CACHE_BUSTER;
+    badge.style.cssText = [
+      "position:fixed",
+      "right:12px",
+      "bottom:12px",
+      "z-index:999999",
+      "background:#12351f",
+      "color:#ffffff",
+      "font-family:Arial, sans-serif",
+      "font-size:12px",
+      "font-weight:800",
+      "letter-spacing:.02em",
+      "padding:9px 12px",
+      "border-radius:999px",
+      "box-shadow:0 8px 24px rgba(0,0,0,.24)",
+      "border:1px solid rgba(255,255,255,.5)"
+    ].join(";");
+    badge.setAttribute("data-syncetc-version", VERSION_LABEL);
+    badge.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
+    document.body.appendChild(badge);
+
+    const root = document.getElementById(ROOT_ID);
+    if (root) {
+      root.setAttribute("data-syncetc-js-version", VERSION_LABEL);
+      root.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
+    }
+
+    console.log("SYNCETC HOSTED JS VERSION LOADED:", VERSION_LABEL, CACHE_BUSTER);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", installBadge);
+  } else {
+    installBadge();
+  }
+})();
+/* syncetc_current_visible_asset_version_badge_v15_version_badge - END */
+
+
 /* syncetc-homepage-current-all-in-one.js - END */
