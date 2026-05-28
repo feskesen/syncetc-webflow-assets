@@ -1239,37 +1239,66 @@
 })();
 /* syncetc_current_public_preview_mode_toggle_v14 - END */
 
-/* syncetc_current_visible_asset_version_badge_v15_version_badge - BEGIN */
+/* syncetc_current_visible_asset_version_badge_v16_prominent - BEGIN */
 (function () {
-  const VERSION_LABEL = "SyncEtc JS v15-version-badge";
-  const CACHE_BUSTER = "?v=15-version-badge";
+  const VERSION_LABEL = "SyncEtc Hosted JS v16-prominent-version";
+  const CACHE_BUSTER = "?v=16-prominent-version";
   const ROOT_ID = "syncetc-generated-homepage-v2";
+  const TOP_BAR_ID = "syncetc-hosted-version-topbar";
+  const FLOAT_BADGE_ID = "syncetc-visible-version-badge";
 
-  function installBadge() {
-    if (document.getElementById("syncetc-visible-version-badge")) return;
+  function installVersionMarkers() {
+    if (!document.getElementById(TOP_BAR_ID)) {
+      const bar = document.createElement("div");
+      bar.id = TOP_BAR_ID;
+      bar.textContent = VERSION_LABEL + " loaded " + CACHE_BUSTER;
+      bar.setAttribute("data-syncetc-version", VERSION_LABEL);
+      bar.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
+      bar.style.cssText = [
+        "display:block",
+        "width:100%",
+        "box-sizing:border-box",
+        "padding:10px 14px",
+        "margin:0",
+        "background:#12351f",
+        "color:#ffffff",
+        "font-family:Arial, sans-serif",
+        "font-size:13px",
+        "font-weight:900",
+        "letter-spacing:.03em",
+        "text-align:center",
+        "border-bottom:3px solid #75b66a",
+        "position:relative",
+        "z-index:999998"
+      ].join(";");
+      document.body.insertBefore(bar, document.body.firstChild);
+    }
 
-    const badge = document.createElement("div");
-    badge.id = "syncetc-visible-version-badge";
-    badge.textContent = VERSION_LABEL + " loaded " + CACHE_BUSTER;
-    badge.style.cssText = [
-      "position:fixed",
-      "right:12px",
-      "bottom:12px",
-      "z-index:999999",
-      "background:#12351f",
-      "color:#ffffff",
-      "font-family:Arial, sans-serif",
-      "font-size:12px",
-      "font-weight:800",
-      "letter-spacing:.02em",
-      "padding:9px 12px",
-      "border-radius:999px",
-      "box-shadow:0 8px 24px rgba(0,0,0,.24)",
-      "border:1px solid rgba(255,255,255,.5)"
-    ].join(";");
-    badge.setAttribute("data-syncetc-version", VERSION_LABEL);
-    badge.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
-    document.body.appendChild(badge);
+    if (!document.getElementById(FLOAT_BADGE_ID)) {
+      const badge = document.createElement("div");
+      badge.id = FLOAT_BADGE_ID;
+      badge.textContent = "JS v16 loaded";
+      badge.setAttribute("data-syncetc-version", VERSION_LABEL);
+      badge.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
+      badge.style.cssText = [
+        "position:fixed",
+        "right:12px",
+        "top:12px",
+        "z-index:999999",
+        "background:#12351f",
+        "color:#ffffff",
+        "font-family:Arial, sans-serif",
+        "font-size:12px",
+        "font-weight:900",
+        "letter-spacing:.02em",
+        "padding:8px 11px",
+        "border-radius:999px",
+        "box-shadow:0 8px 24px rgba(0,0,0,.24)",
+        "border:1px solid rgba(255,255,255,.55)",
+        "pointer-events:none"
+      ].join(";");
+      document.body.appendChild(badge);
+    }
 
     const root = document.getElementById(ROOT_ID);
     if (root) {
@@ -1281,12 +1310,12 @@
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", installBadge);
+    document.addEventListener("DOMContentLoaded", installVersionMarkers);
   } else {
-    installBadge();
+    installVersionMarkers();
   }
 })();
-/* syncetc_current_visible_asset_version_badge_v15_version_badge - END */
+/* syncetc_current_visible_asset_version_badge_v16_prominent - END */
 
 
 /* syncetc-homepage-current-all-in-one.js - END */
