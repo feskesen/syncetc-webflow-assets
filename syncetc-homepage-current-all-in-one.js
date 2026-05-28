@@ -1,7 +1,7 @@
 /* syncetc-homepage-current-all-in-one.js - BEGIN */
 /*
   Hosted SyncEtc Webflow asset.
-  Update 86 / v14: homepage admin editing preview.
+  Update 89 / v17: homepage admin editing workspace preview.
   Upload this single file to the current hosted root file for now:
   syncetc-homepage-current-all-in-one.js
 
@@ -595,55 +595,112 @@
 
     if (!fields.length) {
       target.innerHTML =
-        '<section class="se-admin-editing-preview" aria-label="Homepage admin editing preview">' +
+        '<section class="se-admin-editing-preview se-admin-editing-workspace" aria-label="Homepage admin editing workspace">' +
           '<div class="se-admin-editing-inner">' +
-            '<div class="se-admin-editing-empty">Homepage admin editing payload is not available yet. Run Update 86 SQL, then refresh with the current cache-busted JS.</div>' +
+            '<div class="se-admin-editing-empty">Homepage admin editing payload is not available yet. Run the latest admin editing SQL, then refresh with the current cache-busted JS.</div>' +
           '</div>' +
         '</section>';
       return;
     }
 
-    const customerFacing = summary.customer_facing_field_count || fields.filter(function (field) { return field.is_customer_editable && !field.is_builder_only; }).length;
-    const builderOnly = summary.builder_only_field_count || fields.filter(function (field) { return field.is_builder_only; }).length;
-    const draftValues = summary.draft_value_count || fields.length;
-
-    const visibleFields = fields
+    const sortedFields = fields
       .slice()
-      .sort(function (a, b) { return Number(a.sort_order || 0) - Number(b.sort_order || 0); })
-      .slice(0, 10);
+      .sort(function (a, b) { return Number(a.sort_order || 0) - Number(b.sort_order || 0); });
+
+    const customerFacing = summary.customer_facing_field_count || sortedFields.filter(function (field) { return field.is_customer_editable && !field.is_builder_only; }).length;
+    const builderOnly = summary.builder_only_field_count || sortedFields.filter(function (field) { return field.is_builder_only; }).length;
+    const draftValues = summary.draft_value_count || sortedFields.length;
+    const visibleFields = sortedFields.slice(0, 14);
+
+    function controlFor(field, index) {
+      const key = field.field_key || ('field_' + index);
+      const label = field.field_label || key;
+      const valueText = valueToDisplay(field.value);
+      const type = String(field.control_key || field.value_type_key || 'text').toLowerCase();
+      const disabledReason = field.is_builder_only ? 'Builder only' : (field.is_customer_editable ? 'Customer editable' : 'Locked');
+      const disabled = field.is_customer_editable || field.is_builder_only ? '' : ' disabled';
+      const common = ' data-se-edit-field="' + escapeHtml(key) + '" data-se-edit-label="' + escapeHtml(label) + '"';
+      let control = '';
+
+      if (type.indexOf('textarea') >= 0 || String(valueText).length > 90) {
+        control = '<textarea class="se-admin-form-control" rows="3"' + common + disabled + '>' + escapeHtml(valueText || '') + '</textarea>';
+      } else if (type.indexOf('boolean') >= 0 || type.indexOf('toggle') >= 0 || type.indexOf('switch') >= 0) {
+        const checked = valueText === 'true' ? ' checked' : '';
+        control = '<label class="se-admin-toggle"><input type="checkbox"' + common + checked + disabled + '><span>' + escapeHtml(valueText === 'true' ? 'On' : 'Off') + '</span></label>';
+      } else {
+        control = '<input class="se-admin-form-control" type="text" value="' + escapeHtml(valueText || '') + '"' + common + disabled + '>';
+      }
+
+      return '<div class="se-admin-form-row" data-se-admin-form-row>' +
+        '<div class="se-admin-form-label-line">' +
+          '<label>' + escapeHtml(label) + '</label>' +
+          '<span>' + escapeHtml(disabledReason) + '</span>' +
+        '</div>' +
+        control +
+        (field.help_text ? '<div class="se-admin-editing-help">' + escapeHtml(field.help_text) + '</div>' : '') +
+      '</div>';
+    }
 
     target.innerHTML =
-      '<section class="se-admin-editing-preview" aria-label="Homepage admin editing preview">' +
+      '<section class="se-admin-editing-preview se-admin-editing-workspace" aria-label="Homepage admin editing workspace">' +
         '<div class="se-admin-editing-inner">' +
           '<div class="se-admin-editing-header">' +
             '<div>' +
-              '<div class="se-admin-editing-title">Homepage admin editing preview</div>' +
-              '<div class="se-admin-editing-note">Read-only proof that safe editable homepage fields and draft values are now in the Supabase payload. Save/publish actions are not enabled yet.</div>' +
+              '<div class="se-admin-editing-title">Homepage admin editing workspace</div>' +
+              '<div class="se-admin-editing-note">Interactive prototype form. Local changes update the draft preview below, but Save Draft and Publish are intentionally disabled until authenticated write actions are built.</div>' +
             '</div>' +
             '<div class="se-admin-editing-counts">' +
               '<span class="se-admin-editing-pill">' + escapeHtml(String(customerFacing)) + ' customer fields</span>' +
               '<span class="se-admin-editing-pill">' + escapeHtml(String(builderOnly)) + ' builder-only</span>' +
               '<span class="se-admin-editing-pill">' + escapeHtml(String(draftValues)) + ' draft values</span>' +
+              '<span class="se-admin-editing-pill">JS v17</span>' +
             '</div>' +
           '</div>' +
-          '<div class="se-admin-editing-grid">' +
-            visibleFields.map(function (field) {
-              const meta = (field.control_label || field.control_key || field.value_type_key || "field");
-              const valueText = valueToDisplay(field.value);
-              return '<div class="se-admin-editing-field">' +
-                '<div class="se-admin-editing-field-label">' +
-                  '<span>' + escapeHtml(field.field_label || field.field_key || "Field") + '</span>' +
-                  '<span class="se-admin-editing-field-meta">' + escapeHtml(meta) + '</span>' +
-                '</div>' +
-                '<div class="se-admin-editing-value">' + escapeHtml(valueText || "[blank]") + '</div>' +
-                (field.help_text ? '<div class="se-admin-editing-help">' + escapeHtml(field.help_text) + '</div>' : '') +
-              '</div>';
-            }).join("") +
+          '<div class="se-admin-workspace-actions">' +
+            '<span data-se-unsaved-count>Unsaved local changes: 0</span>' +
+            '<button type="button" disabled>Save draft - future</button>' +
+            '<button type="button" disabled>Publish changes - future</button>' +
           '</div>' +
+          '<div class="se-admin-form-grid">' + visibleFields.map(controlFor).join('') + '</div>' +
+          '<details class="se-admin-draft-preview" open>' +
+            '<summary>Local draft preview</summary>' +
+            '<pre data-se-draft-json>{}</pre>' +
+          '</details>' +
         '</div>' +
       '</section>';
-  }
 
+    const changeMap = {};
+    const countEl = target.querySelector('[data-se-unsaved-count]');
+    const jsonEl = target.querySelector('[data-se-draft-json]');
+
+    function updateDraftPreview() {
+      if (countEl) {
+        countEl.textContent = 'Unsaved local changes: ' + Object.keys(changeMap).length;
+      }
+      if (jsonEl) {
+        jsonEl.textContent = JSON.stringify(changeMap, null, 2);
+      }
+    }
+
+    target.querySelectorAll('[data-se-edit-field]').forEach(function (control) {
+      control.addEventListener('input', function () {
+        const key = control.getAttribute('data-se-edit-field');
+        const label = control.getAttribute('data-se-edit-label') || key;
+        const value = control.type === 'checkbox' ? control.checked : control.value;
+        changeMap[key] = { label: label, value: value };
+        updateDraftPreview();
+      });
+      control.addEventListener('change', function () {
+        const key = control.getAttribute('data-se-edit-field');
+        const label = control.getAttribute('data-se-edit-label') || key;
+        const value = control.type === 'checkbox' ? control.checked : control.value;
+        changeMap[key] = { label: label, value: value };
+        updateDraftPreview();
+      });
+    });
+
+    updateDraftPreview();
+  }
 
   function renderNavigationItem(item) {
     const label = item.item_label || item.item_key || "Item";
@@ -1239,10 +1296,52 @@
 })();
 /* syncetc_current_public_preview_mode_toggle_v14 - END */
 
-/* syncetc_current_visible_asset_version_badge_v16_prominent - BEGIN */
+/* syncetc_update_89_admin_edit_workspace_styles - BEGIN */
 (function () {
-  const VERSION_LABEL = "SyncEtc Hosted JS v16-prominent-version";
-  const CACHE_BUSTER = "?v=16-prominent-version";
+  const STYLE_ID = "syncetc-update-89-admin-edit-workspace-style";
+  if (document.getElementById(STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = STYLE_ID;
+  style.textContent = `
+    .se-admin-editing-workspace .se-admin-workspace-actions {
+      display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:14px 0 16px;
+      padding:10px; border:1px solid rgba(18,53,31,.16); border-radius:16px; background:rgba(255,255,255,.72);
+      color:#12351f; font-weight:850; font-size:12px;
+    }
+    .se-admin-editing-workspace .se-admin-workspace-actions button {
+      border:1px solid rgba(18,53,31,.18); background:#f5f0e6; color:#795119; border-radius:999px;
+      padding:8px 11px; font-weight:850; cursor:not-allowed; opacity:.85;
+    }
+    .se-admin-editing-workspace .se-admin-form-grid {
+      display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; margin-top:10px;
+    }
+    .se-admin-editing-workspace .se-admin-form-row {
+      border:1px solid rgba(18,53,31,.13); border-radius:16px; padding:12px; background:rgba(255,255,255,.84);
+    }
+    .se-admin-editing-workspace .se-admin-form-label-line {
+      display:flex; justify-content:space-between; gap:8px; align-items:center; margin-bottom:7px;
+      color:#12351f; font-weight:900; font-size:12px;
+    }
+    .se-admin-editing-workspace .se-admin-form-label-line span { color:#795119; font-size:10px; text-transform:uppercase; letter-spacing:.05em; }
+    .se-admin-editing-workspace .se-admin-form-control {
+      width:100%; box-sizing:border-box; border:1px solid rgba(18,53,31,.18); border-radius:12px; padding:9px 10px;
+      font:inherit; color:#12351f; background:#ffffff; outline:none;
+    }
+    .se-admin-editing-workspace .se-admin-form-control:focus { border-color:#2f6537; box-shadow:0 0 0 3px rgba(47,101,55,.12); }
+    .se-admin-editing-workspace .se-admin-toggle { display:flex; align-items:center; gap:8px; color:#12351f; font-weight:850; }
+    .se-admin-editing-workspace .se-admin-draft-preview { margin-top:14px; border:1px solid rgba(18,53,31,.13); border-radius:16px; padding:10px 12px; background:rgba(255,255,255,.72); }
+    .se-admin-editing-workspace .se-admin-draft-preview summary { cursor:pointer; color:#12351f; font-weight:900; }
+    .se-admin-editing-workspace .se-admin-draft-preview pre { white-space:pre-wrap; overflow:auto; max-height:220px; margin:10px 0 0; font-size:11px; color:#12351f; }
+    @media (max-width: 760px) { .se-admin-editing-workspace .se-admin-form-grid { grid-template-columns:1fr; } }
+  `;
+  document.head.appendChild(style);
+})();
+/* syncetc_update_89_admin_edit_workspace_styles - END */
+
+/* syncetc_current_visible_asset_version_badge_v17_admin_edit_workspace - BEGIN */
+(function () {
+  const VERSION_LABEL = "SyncEtc Hosted JS v17-admin-edit-workspace";
+  const CACHE_BUSTER = "?v=17-admin-edit-workspace";
   const ROOT_ID = "syncetc-generated-homepage-v2";
   const TOP_BAR_ID = "syncetc-hosted-version-topbar";
   const FLOAT_BADGE_ID = "syncetc-visible-version-badge";
@@ -1277,7 +1376,7 @@
     if (!document.getElementById(FLOAT_BADGE_ID)) {
       const badge = document.createElement("div");
       badge.id = FLOAT_BADGE_ID;
-      badge.textContent = "JS v16 loaded";
+      badge.textContent = "JS v17 loaded";
       badge.setAttribute("data-syncetc-version", VERSION_LABEL);
       badge.setAttribute("data-syncetc-cache-buster", CACHE_BUSTER);
       badge.style.cssText = [
@@ -1315,7 +1414,7 @@
     installVersionMarkers();
   }
 })();
-/* syncetc_current_visible_asset_version_badge_v16_prominent - END */
+/* syncetc_current_visible_asset_version_badge_v17_admin_edit_workspace - END */
 
 
 /* syncetc-homepage-current-all-in-one.js - END */
