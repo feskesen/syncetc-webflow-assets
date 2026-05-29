@@ -1,0 +1,26 @@
+syncetc-calendar-v32B-loader-note.txt
+
+Webflow loader modal entry:
+syncetc-calendar-v32B-date-shell-nav-fix.js
+
+Purpose:
+This patch fixes the Calendar date display and restores the SyncEtc rendered-site shell around the Calendar page.
+
+What changed:
+1. Dates now normalize from start_at/end_at and common alternate field names.
+2. The embedded fallback calendar data now includes the corrected dates, so the page will still show dates even if the public payload endpoint is stale or unavailable.
+3. If the public payload returns rows without dates, the JS attempts direct Supabase REST when an anon key is available, then falls back to corrected embedded data.
+4. The page now renders the master control area, 150th header, public nav row, banner strip, and then the Calendar module.
+5. The visible version marker should show:
+syncetc-calendar-v32B-date-shell-nav-fix
+
+No Supabase paste/run step is required for this patch.
+
+Expected test:
+Upload syncetc-calendar-v32B-date-shell-nav-fix.js to GitHub Pages.
+In the Webflow loader modal, paste exactly:
+syncetc-calendar-v32B-date-shell-nav-fix.js
+
+Then reload the page.
+The calendar cards should show dates instead of "Date not set."
+The top of the page should show the rendered-site controls and 150th Aero header/nav shell.
