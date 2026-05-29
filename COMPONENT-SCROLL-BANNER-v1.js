@@ -1,4 +1,4 @@
-/* COMPONENT-SCROLL-BANNER-v1.js - BEGIN */
+/* COMPONENT-scroll-banner-v1.js - BEGIN */
 (function () {
   "use strict";
 
@@ -48,4 +48,4 @@
 
   window.SyncEtc.Components.ScrollBanner = { render: render, installStyles: installStyles };
 })();
-/* COMPONENT-SCROLL-BANNER-v1.js - END */
+/* COMPONENT-scroll-banner-v1.js - END */

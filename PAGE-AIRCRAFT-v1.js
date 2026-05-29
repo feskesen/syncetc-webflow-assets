@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const COMPONENT_FILES = ["COMPONENT-SHARED-UTILS-v1.js", "COMPONENT-CUSTOMER-STYLE-v1.js", "COMPONENT-BASE-STYLES-v1.js", "COMPONENT-MASTER-CONTROLS-v1.js", "COMPONENT-MASTER-HEADER-v1.js", "COMPONENT-SCROLL-BANNER-v1.js", "COMPONENT-MASTER-FOOTER-v1.js", "COMPONENT-SITE-SHELL-v1.js"];
+  const COMPONENT_FILES = ["COMPONENT-shared-utils-v1.js", "COMPONENT-customer-style-v1.js", "COMPONENT-base-styles-v1.js", "COMPONENT-master-controls-v1.js", "COMPONENT-master-header-v1.js", "COMPONENT-scroll-banner-v1.js", "COMPONENT-master-footer-v1.js", "COMPONENT-site-shell-v1.js"];
   const CURRENT_SCRIPT_SRC = document.currentScript && document.currentScript.src ? document.currentScript.src : "";
 
   function componentBaseUrl() {
