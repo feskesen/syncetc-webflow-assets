@@ -49,7 +49,7 @@
     var base = componentBaseUrl();
     return COMPONENT_FILES.reduce(function(p, file) {
       return p.then(function() {
-        return loadScriptOnce(base + file + "?v=aircraft-policy-v1");
+        return loadScriptOnce(base + file + "?v=page-aware-customer-settings-aircraft-1");
       });
     }, Promise.resolve());
   }
@@ -177,305 +177,143 @@
     var style = document.createElement("style");
     style.id = STYLE_ID;
     style.textContent = `
-      .aero-fleet-page {
-        max-width:1180px;
-        margin:34px auto 56px;
-        padding:0 18px;
-        font-family:Arial, Helvetica, sans-serif;
-        color:var(--se-aero-text, #1e2933);
-      }
-      .aero-fleet-shell {
-        background:var(--se-aero-card, rgba(255,255,255,.94));
-        border:1px solid var(--se-aero-border, rgba(18,54,90,.16));
-        border-radius:var(--se-radius-xl, 26px);
-        box-shadow:var(--se-shadow-lg, 0 18px 50px rgba(12,38,64,.22));
-        overflow:hidden;
-        backdrop-filter:blur(8px);
-      }
-      .aero-fleet-hero {
-        position:relative;
-        padding:34px 34px 28px;
-        background:
-          linear-gradient(135deg, var(--se-aero-navy, #12365a), var(--se-aero-blue, #2f80c4)),
-          radial-gradient(circle at top right, rgba(255,255,255,.34), transparent 36%);
-        color:#fff;
-      }
-      .aero-fleet-eyebrow {
-        display:inline-flex;
-        align-items:center;
-        gap:8px;
-        margin-bottom:12px;
-        padding:6px 12px;
-        border-radius:999px;
-        background:rgba(255,255,255,.16);
-        border:1px solid rgba(255,255,255,.24);
-        font-size:12px;
-        font-weight:800;
-        letter-spacing:.08em;
-        text-transform:uppercase;
-      }
-      .aero-fleet-hero h1 {
-        margin:0;
-        font-size:clamp(30px,4vw,48px);
-        line-height:1.05;
-        font-weight:800;
-        letter-spacing:-.035em;
-        color:#fff;
-      }
-      .aero-fleet-hero p {
-        max-width:820px;
-        margin:14px 0 0;
-        font-size:17px;
-        line-height:1.65;
-        color:rgba(255,255,255,.9);
-      }
-      .aero-fleet-stats {
-        display:grid;
-        grid-template-columns:repeat(3,1fr);
-        gap:12px;
-        margin-top:26px;
-      }
-      .aero-fleet-stat {
-        padding:14px 16px;
-        border-radius:var(--se-radius-md, 12px);
-        background:rgba(255,255,255,.14);
-        border:1px solid rgba(255,255,255,.22);
-      }
-      .aero-fleet-stat strong {
-        display:block;
-        margin-bottom:3px;
-        font-size:22px;
-        line-height:1;
-        color:#fff;
-      }
-      .aero-fleet-stat span {
-        display:block;
-        font-size:13px;
-        line-height:1.35;
-        color:rgba(255,255,255,.82);
-      }
+      .aero-fleet-page { max-width:1180px; margin:34px auto 56px; padding:0 18px; font-family:Arial, Helvetica, sans-serif; color:var(--se-aero-text, #1e2933); }
+      .aero-fleet-shell { background:var(--se-aero-card, rgba(255,255,255,.94)); border:1px solid var(--se-aero-border, rgba(18,54,90,.16)); border-radius:var(--se-radius-xl, 26px); box-shadow:var(--se-shadow-lg, 0 18px 50px rgba(12,38,64,.22)); overflow:hidden; backdrop-filter:blur(8px); }
+      .aero-fleet-hero { position:relative; padding:34px 34px 28px; background:linear-gradient(135deg, var(--se-aero-navy, #12365a), var(--se-aero-blue, #2f80c4)),radial-gradient(circle at top right, rgba(255,255,255,.34), transparent 36%); color:#fff; }
+      .aero-fleet-eyebrow { display:inline-flex; align-items:center; gap:8px; margin-bottom:12px; padding:6px 12px; border-radius:999px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.24); font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+      .aero-fleet-hero h1 { margin:0; font-size:clamp(30px,4vw,48px); line-height:1.05; font-weight:800; letter-spacing:-.035em; color:#fff; }
+      .aero-fleet-hero p { max-width:820px; margin:14px 0 0; font-size:17px; line-height:1.65; color:rgba(255,255,255,.9); }
+      .aero-fleet-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:26px; }
+      .aero-fleet-stat { padding:14px 16px; border-radius:var(--se-radius-md, 12px); background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.22); }
+      .aero-fleet-stat strong { display:block; margin-bottom:3px; font-size:22px; line-height:1; color:#fff; }
+      .aero-fleet-stat span { display:block; font-size:13px; line-height:1.35; color:rgba(255,255,255,.82); }
       .aero-fleet-main { padding:26px; }
-      .aero-section-label {
-        display:inline-flex;
-        margin-bottom:10px;
-        padding:5px 10px;
-        border-radius:999px;
-        background:var(--se-aero-sky, #eaf5ff);
-        color:var(--se-aero-navy, #12365a);
-        font-size:11px;
-        font-weight:800;
-        letter-spacing:.08em;
-        text-transform:uppercase;
-      }
-      .aero-fleet-intro-card {
-        margin-bottom:18px;
-        padding:22px;
-        border-radius:var(--se-radius-lg, 18px);
-        background:rgba(255,255,255,.82);
-        border:1px solid var(--se-aero-border, rgba(18,54,90,.16));
-        box-shadow:0 8px 24px rgba(12,38,64,.08);
-      }
-      .aero-fleet-intro-card h2,
-      .aero-aircraft-copy h2 {
-        margin:0 0 10px;
-        color:var(--se-aero-navy-dark, #0b2744);
-        font-size:23px;
-        line-height:1.18;
-        font-weight:800;
-        letter-spacing:-.02em;
-      }
-      .aero-fleet-intro-card p {
-        margin:0;
-        font-size:15px;
-        line-height:1.7;
-        color:var(--se-aero-text, #1e2933);
-      }
+      .aero-section-label { display:inline-flex; margin-bottom:10px; padding:5px 10px; border-radius:999px; background:var(--se-aero-sky, #eaf5ff); color:var(--se-aero-navy, #12365a); font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+      .aero-fleet-intro-card { margin-bottom:18px; padding:22px; border-radius:var(--se-radius-lg, 18px); background:rgba(255,255,255,.82); border:1px solid var(--se-aero-border, rgba(18,54,90,.16)); box-shadow:0 8px 24px rgba(12,38,64,.08); }
+      .aero-fleet-intro-card h2,.aero-aircraft-copy h2 { margin:0 0 10px; color:var(--se-aero-navy-dark, #0b2744); font-size:23px; line-height:1.18; font-weight:800; letter-spacing:-.02em; }
+      .aero-fleet-intro-card p { margin:0; font-size:15px; line-height:1.7; color:var(--se-aero-text, #1e2933); }
       .aero-aircraft-list { display:grid; gap:22px; }
-      .aero-aircraft-card {
-        display:grid;
-        grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr);
-        gap:22px;
-        align-items:start;
-        padding:22px;
-        border-radius:var(--se-radius-lg, 18px);
-        background:var(--se-aero-card-soft, rgba(255,255,255,.84));
-        border:1px solid var(--se-aero-border, rgba(18,54,90,.16));
-        box-shadow:0 8px 24px rgba(12,38,64,.08);
-      }
-      .aero-aircraft-header {
-        display:flex;
-        flex-wrap:wrap;
-        align-items:baseline;
-        gap:8px 12px;
-        margin-bottom:8px;
-      }
-      .aero-tail-number {
-        margin:0;
-        color:var(--se-aero-navy-dark, #0b2744);
-        font-size:28px;
-        line-height:1.05;
-        font-weight:800;
-        letter-spacing:-.025em;
-      }
-      .aero-aircraft-meta {
-        color:var(--se-aero-muted, #5d6b78);
-        font-size:14px;
-        line-height:1.2;
-        font-weight:800;
-        letter-spacing:.03em;
-        text-transform:uppercase;
-      }
+      .aero-aircraft-card { display:grid; grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr); gap:22px; align-items:start; padding:22px; border-radius:var(--se-radius-lg, 18px); background:var(--se-aero-card-soft, rgba(255,255,255,.84)); border:1px solid var(--se-aero-border, rgba(18,54,90,.16)); box-shadow:0 8px 24px rgba(12,38,64,.08); }
+      .aero-aircraft-header { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 12px; margin-bottom:8px; }
+      .aero-tail-number { margin:0; color:var(--se-aero-navy-dark, #0b2744); font-size:28px; line-height:1.05; font-weight:800; letter-spacing:-.025em; }
+      .aero-aircraft-meta { color:var(--se-aero-muted, #5d6b78); font-size:14px; line-height:1.2; font-weight:800; letter-spacing:.03em; text-transform:uppercase; }
       .aero-aircraft-copy { min-width:0; }
-      .aero-aircraft-copy p {
-        margin:0 0 13px;
-        font-size:15px;
-        line-height:1.7;
-        color:var(--se-aero-text, #1e2933);
-      }
-      .aero-aircraft-copy ul {
-        margin:12px 0 0 20px;
-        padding:0;
-        color:var(--se-aero-text, #1e2933);
-        font-size:14px;
-        line-height:1.55;
-      }
+      .aero-aircraft-copy p { margin:0 0 13px; font-size:15px; line-height:1.7; color:var(--se-aero-text, #1e2933); }
+      .aero-aircraft-copy ul { margin:12px 0 0 20px; padding:0; color:var(--se-aero-text, #1e2933); font-size:14px; line-height:1.55; }
       .aero-aircraft-copy li { margin-bottom:4px; }
       .aero-aircraft-copy em { color:var(--se-aero-navy-dark, #0b2744); }
       .aero-aircraft-media { display:grid; gap:14px; }
-      .aero-aircraft-photo-card {
-        overflow:hidden;
-        border-radius:16px;
-        background:#fff;
-        border:1px solid rgba(18,54,90,.16);
-        box-shadow:0 8px 20px rgba(12,38,64,.08);
-      }
-      .aero-aircraft-photo-card img {
-        display:block;
-        width:100%;
-        height:230px;
-        object-fit:cover;
-        object-position:center center;
-      }
-      .aero-aircraft-photo-label {
-        padding:9px 12px;
-        color:var(--se-aero-muted, #5d6b78);
-        font-size:12px;
-        line-height:1.25;
-        font-weight:800;
-        letter-spacing:.08em;
-        text-transform:uppercase;
-        background:rgba(234,245,255,.72);
-        border-top:1px solid rgba(18,54,90,.10);
-      }
-      .aero-aircraft-placeholder {
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        min-height:230px;
-        padding:22px;
-        background:linear-gradient(135deg,rgba(234,245,255,.96),rgba(255,255,255,.88));
-        color:var(--se-aero-muted, #5d6b78);
-        font-size:13px;
-        line-height:1.45;
-        font-weight:800;
-        text-align:center;
-      }
-      .aero-empty-message {
-        padding:18px;
-        border-radius:16px;
-        background:#fff;
-        border:1px dashed rgba(18,54,90,.24);
-        color:var(--se-aero-muted, #5d6b78);
-        font-size:14px;
-        line-height:1.55;
-      }
-      .aero-note-strip {
-        margin-top:18px;
-        padding:16px 18px;
-        border-radius:16px;
-        background:rgba(18,54,90,.06);
-        border:1px solid rgba(18,54,90,.12);
-        color:var(--se-aero-muted, #5d6b78);
-        font-size:13px;
-        line-height:1.55;
-      }
-      @media (max-width:980px){
-        .aero-aircraft-card{grid-template-columns:1fr;}
-        .aero-aircraft-media{grid-template-columns:repeat(2,minmax(0,1fr));}
-      }
-      @media (max-width:720px){
-        .aero-fleet-page{margin-top:20px;padding:0 12px;}
-        .aero-fleet-hero{padding:26px 20px 22px;}
-        .aero-fleet-main{padding:18px;}
-        .aero-fleet-stats{grid-template-columns:1fr;}
-        .aero-fleet-intro-card,.aero-aircraft-card{padding:18px;}
-        .aero-aircraft-media{grid-template-columns:1fr;}
-        .aero-aircraft-photo-card img,.aero-aircraft-placeholder{height:210px;min-height:210px;}
-        .aero-tail-number{font-size:25px;}
-      }
+      .aero-aircraft-photo-card { overflow:hidden; border-radius:16px; background:#fff; border:1px solid rgba(18,54,90,.16); box-shadow:0 8px 20px rgba(12,38,64,.08); }
+      .aero-aircraft-photo-card img { display:block; width:100%; height:230px; object-fit:cover; object-position:center center; }
+      .aero-aircraft-photo-label { padding:9px 12px; color:var(--se-aero-muted, #5d6b78); font-size:12px; line-height:1.25; font-weight:800; letter-spacing:.08em; text-transform:uppercase; background:rgba(234,245,255,.72); border-top:1px solid rgba(18,54,90,.10); }
+      .aero-aircraft-placeholder { display:flex; align-items:center; justify-content:center; min-height:230px; padding:22px; background:linear-gradient(135deg,rgba(234,245,255,.96),rgba(255,255,255,.88)); color:var(--se-aero-muted, #5d6b78); font-size:13px; line-height:1.45; font-weight:800; text-align:center; }
+      .aero-empty-message { padding:18px; border-radius:16px; background:#fff; border:1px dashed rgba(18,54,90,.24); color:var(--se-aero-muted, #5d6b78); font-size:14px; line-height:1.55; }
+      .aero-note-strip { margin-top:18px; padding:16px 18px; border-radius:16px; background:rgba(18,54,90,.06); border:1px solid rgba(18,54,90,.12); color:var(--se-aero-muted, #5d6b78); font-size:13px; line-height:1.55; }
+      @media (max-width:980px){ .aero-aircraft-card{grid-template-columns:1fr;} .aero-aircraft-media{grid-template-columns:repeat(2,minmax(0,1fr));} }
+      @media (max-width:720px){ .aero-fleet-page{margin-top:20px;padding:0 12px;} .aero-fleet-hero{padding:26px 20px 22px;} .aero-fleet-main{padding:18px;} .aero-fleet-stats{grid-template-columns:1fr;} .aero-fleet-intro-card,.aero-aircraft-card{padding:18px;} .aero-aircraft-media{grid-template-columns:1fr;} .aero-aircraft-photo-card img,.aero-aircraft-placeholder{height:210px;min-height:210px;} .aero-tail-number{font-size:25px;} }
     `;
     document.head.appendChild(style);
   }
 
-  function configForCustomer(customerKey) {
-    if (customerKey === "150th_aero") return AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"];
-    if (customerKey === "demo_flying_club") return AIRCRAFT_PAGE_DEFAULTS["Test Customer"] || AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"];
-    return AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"];
+  function baseConfig(customerKey) {
+    if (customerKey === "150th_aero") return JSON.parse(JSON.stringify(AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"]));
+    if (customerKey === "demo_flying_club") return JSON.parse(JSON.stringify(AIRCRAFT_PAGE_DEFAULTS["Test Customer"] || AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"]));
+    return JSON.parse(JSON.stringify(AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"]));
   }
 
-  function inlineText(v) {
-    return esc(v).replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  function localValue(local,key,fallback) {
+    return Object.prototype.hasOwnProperty.call(local||{},key) ? local[key] : fallback;
   }
 
-  function renderAircraftPage(customerKey) {
+  function configFor(customerKey,local) {
+    var cfg = baseConfig(customerKey);
+    cfg.heroEyebrow = localValue(local,"aircraft.heroEyebrow",cfg.heroEyebrow);
+    cfg.heroTitle = localValue(local,"aircraft.heroTitle",cfg.heroTitle);
+    cfg.heroIntro = localValue(local,"aircraft.heroIntro",cfg.heroIntro);
+    cfg.introLabel = localValue(local,"aircraft.introLabel",cfg.introLabel);
+    cfg.introTitle = localValue(local,"aircraft.introTitle",cfg.introTitle);
+    cfg.introText = localValue(local,"aircraft.introText",cfg.introText);
+    cfg.note = localValue(local,"aircraft.note",cfg.note);
+    for(var i=0;i<3;i++) {
+      cfg.stats[i] = cfg.stats[i] || {};
+      cfg.stats[i].value = localValue(local,"aircraft.stats."+i+".value",cfg.stats[i].value || "");
+      cfg.stats[i].text = localValue(local,"aircraft.stats."+i+".text",cfg.stats[i].text || "");
+    }
+    return cfg;
+  }
+
+  function registerPageSettings(shell) {
+    if (!window.SyncEtc || !window.SyncEtc.Components || !window.SyncEtc.Components.CustomerSettings) return;
+    window.SyncEtc.Components.CustomerSettings.registerPage({
+      pageKey:"aircraft",
+      pageLabel:"Aircraft",
+      note:"Customer-owned Aircraft page copy and display controls. Aircraft records themselves belong in the Aircraft Manager, not in this page settings drawer.",
+      getDefaults:function(ctx,api) {
+        var key = (api && api.getState && api.getState().customerKey) || (ctx && ctx.customerKey) || "150th_aero";
+        var cfg = baseConfig(key);
+        return {
+          "aircraft.heroEyebrow": cfg.heroEyebrow || "",
+          "aircraft.heroTitle": cfg.heroTitle || "",
+          "aircraft.heroIntro": cfg.heroIntro || "",
+          "aircraft.stats.0.value": (cfg.stats[0] && cfg.stats[0].value) || "",
+          "aircraft.stats.0.text": (cfg.stats[0] && cfg.stats[0].text) || "",
+          "aircraft.stats.1.value": (cfg.stats[1] && cfg.stats[1].value) || "",
+          "aircraft.stats.1.text": (cfg.stats[1] && cfg.stats[1].text) || "",
+          "aircraft.stats.2.value": (cfg.stats[2] && cfg.stats[2].value) || "",
+          "aircraft.stats.2.text": (cfg.stats[2] && cfg.stats[2].text) || "",
+          "aircraft.introLabel": cfg.introLabel || "",
+          "aircraft.introTitle": cfg.introTitle || "",
+          "aircraft.introText": cfg.introText || "",
+          "aircraft.note": cfg.note || ""
+        };
+      },
+      fields:[
+        {section:"Hero",key:"aircraft.heroEyebrow",label:"Hero Eyebrow",type:"text"},
+        {section:"Hero",key:"aircraft.heroTitle",label:"Hero Title",type:"text"},
+        {section:"Hero",key:"aircraft.heroIntro",label:"Hero Intro",type:"textarea"},
+        {section:"Stat / Bubble 1",key:"aircraft.stats.0.value",label:"Bubble 1 Value",type:"text"},
+        {section:"Stat / Bubble 1",key:"aircraft.stats.0.text",label:"Bubble 1 Text",type:"textarea"},
+        {section:"Stat / Bubble 2",key:"aircraft.stats.1.value",label:"Bubble 2 Value",type:"text"},
+        {section:"Stat / Bubble 2",key:"aircraft.stats.1.text",label:"Bubble 2 Text",type:"textarea"},
+        {section:"Stat / Bubble 3",key:"aircraft.stats.2.value",label:"Bubble 3 Value",type:"text"},
+        {section:"Stat / Bubble 3",key:"aircraft.stats.2.text",label:"Bubble 3 Text",type:"textarea"},
+        {section:"Intro Card",key:"aircraft.introLabel",label:"Intro Label",type:"text"},
+        {section:"Intro Card",key:"aircraft.introTitle",label:"Intro Title",type:"text"},
+        {section:"Intro Card",key:"aircraft.introText",label:"Intro Text",type:"textarea"},
+        {section:"Page Note",key:"aircraft.note",label:"Page Note",type:"textarea"}
+      ],
+      managerLink:{label:"Manage Aircraft Records",pageKey:"aircraft-admin"}
+    });
+  }
+
+  function inlineText(v) { return esc(v).replace(/\*([^*]+)\*/g, "<em>$1</em>"); }
+
+  function renderAircraftPage(customerKey,local) {
     installStyles();
-    var cfg = configForCustomer(customerKey);
+    var cfg = configFor(customerKey,local||{});
     var stats = Array.isArray(cfg.stats) ? cfg.stats : [];
-    var rows = Array.isArray(cfg.aircraft) ? cfg.aircraft.slice().sort(function(a,b) {
-      return (a.sortOrder || 999) - (b.sortOrder || 999);
-    }) : [];
-
-    function statMarkup(s) {
-      return '<div class="aero-fleet-stat"><strong>' + esc(s.value || '') + '</strong><span>' + esc(s.text || '') + '</span></div>';
-    }
-
-    function labelFor(ac) {
-      return String(ac.tailNumber || '').toUpperCase() === 'N150TH' ? 'Flagship Aircraft' : 'Club Aircraft';
-    }
-
-    function metaFor(ac) {
-      return [ac.modelYear, ac.aircraftType].filter(Boolean).join(' ');
-    }
-
+    var rows = Array.isArray(cfg.aircraft) ? cfg.aircraft.slice().sort(function(a,b) { return (a.sortOrder || 999) - (b.sortOrder || 999); }) : [];
+    function statMarkup(s) { return '<div class="aero-fleet-stat"><strong>' + esc(s.value || '') + '</strong><span>' + esc(s.text || '') + '</span></div>'; }
+    function labelFor(ac) { return String(ac.tailNumber || '').toUpperCase() === 'N150TH' ? 'Flagship Aircraft' : 'Club Aircraft'; }
+    function metaFor(ac) { return [ac.modelYear, ac.aircraftType].filter(Boolean).join(' '); }
     function detailsMarkup(ac) {
       var parts = String(ac.details || '').split('||').map(function(x) { return x.trim(); }).filter(Boolean);
       if (!parts.length) return '<p>Aircraft details are not available at this time.</p>';
       var intro = parts.shift();
-      return (intro ? '<p>' + inlineText(intro) + '</p>' : '') +
-        (parts.length ? '<ul>' + parts.map(function(x) { return '<li>' + inlineText(x) + '</li>'; }).join('') + '</ul>' : '');
+      return (intro ? '<p>' + inlineText(intro) + '</p>' : '') + (parts.length ? '<ul>' + parts.map(function(x) { return '<li>' + inlineText(x) + '</li>'; }).join('') + '</ul>' : '');
     }
-
     function photoCard(url, label, alt) {
-      return '<div class="aero-aircraft-photo-card">' +
-        (url ? '<img src="' + esc(url) + '" alt="' + esc(alt || label) + '">' : '<div class="aero-aircraft-placeholder">' + esc(label) + ' photo not available</div>') +
-        '<div class="aero-aircraft-photo-label">' + esc(label) + '</div></div>';
+      return '<div class="aero-aircraft-photo-card">' + (url ? '<img src="' + esc(url) + '" alt="' + esc(alt || label) + '">' : '<div class="aero-aircraft-placeholder">' + esc(label) + ' photo not available</div>') + '<div class="aero-aircraft-photo-label">' + esc(label) + '</div></div>';
     }
-
     function aircraftCard(ac) {
       return '<article class="aero-aircraft-card"><div class="aero-aircraft-copy"><div class="aero-section-label">' + esc(labelFor(ac)) + '</div><div class="aero-aircraft-header"><h2 class="aero-tail-number">' + esc(ac.tailNumber || 'Aircraft') + '</h2><div class="aero-aircraft-meta">' + esc(metaFor(ac) || 'Aircraft Details') + '</div></div>' + detailsMarkup(ac) + '</div><div class="aero-aircraft-media">' + photoCard(ac.aircraftPhoto, 'Exterior', (ac.tailNumber || 'Aircraft') + ' exterior aircraft photo') + photoCard(ac.panelPhoto, 'Panel', (ac.tailNumber || 'Aircraft') + ' panel photo') + '</div></article>';
     }
-
     return '<div class="aero-fleet-page"><div class="aero-fleet-shell"><section class="aero-fleet-hero"><div class="aero-fleet-eyebrow">' + esc(cfg.heroEyebrow) + '</div><h1>' + esc(cfg.heroTitle) + '</h1><p>' + esc(cfg.heroIntro) + '</p><div class="aero-fleet-stats">' + stats.map(statMarkup).join('') + '</div></section><main class="aero-fleet-main"><section class="aero-fleet-intro-card"><div class="aero-section-label">' + esc(cfg.introLabel) + '</div><h2>' + esc(cfg.introTitle) + '</h2><p>' + esc(cfg.introText) + '</p></section><section class="aero-aircraft-list">' + (rows.length ? rows.map(aircraftCard).join('') : '<div class="aero-empty-message">Aircraft information is not available at this time.</div>') + '</section><div class="aero-note-strip"><strong>Note:</strong> ' + esc(cfg.note || '') + '</div></main></div></div>';
   }
 
-  function activeCustomerKey(shell) {
-    try {
-      var s = shell && shell.getState ? shell.getState() : {};
-      return s.customerKey || "150th_aero";
-    } catch (err) {
-      return "150th_aero";
-    }
-  }
+  function shellState(shell) { try { return shell.getState ? shell.getState() : {}; } catch(e) { return {}; } }
+  function activeCustomerKey(shell) { return shellState(shell).customerKey || "150th_aero"; }
+  function activeLocal(shell) { return shellState(shell).local || {}; }
 
   function init() {
     ensureComponents().then(function () {
@@ -483,11 +321,7 @@
       if (window.SyncEtc && window.SyncEtc.AuthSoftBridge && window.SyncEtc.AuthSoftBridge.start) window.SyncEtc.AuthSoftBridge.start();
 
       var mount = document.getElementById(MOUNT_ID);
-      if (!mount) {
-        mount = document.createElement("div");
-        mount.id = MOUNT_ID;
-        document.body.appendChild(mount);
-      }
+      if (!mount) { mount = document.createElement("div"); mount.id = MOUNT_ID; document.body.appendChild(mount); }
 
       var shell = window.SyncEtc.Components.SiteShell.create(MOUNT_ID, {
         customerKey: "150th_aero",
@@ -498,29 +332,20 @@
         version: VERSION
       });
 
-      function renderAll() {
-        shell.render(renderAircraftPage(activeCustomerKey(shell)));
-      }
+      registerPageSettings(shell);
 
-      document.addEventListener("syncetc:customer-hard-change", function () {
-        if (shell.loadCustomer) shell.loadCustomer().then(renderAll);
+      function renderAll() { shell.render(renderAircraftPage(activeCustomerKey(shell),activeLocal(shell))); }
+
+      document.addEventListener("syncetc:customer-hard-change", function () { if (shell.loadCustomer) shell.loadCustomer().then(function(){registerPageSettings(shell);renderAll();}); else renderAll(); });
+      document.addEventListener("syncetc:view-as-hard-change", renderAll);
+      document.addEventListener("syncetc:customer-settings-local-change", function(e) { if(!e.detail || e.detail.pageKey==="aircraft") renderAll(); });
+      document.addEventListener("syncetc:auth-soft-change", function () {
+        if (window.SyncEtc.SecurityContext && window.SyncEtc.SecurityContext.refresh) window.SyncEtc.SecurityContext.refresh(activeCustomerKey(shell)).then(renderAll).catch(renderAll);
         else renderAll();
       });
 
-      document.addEventListener("syncetc:view-as-hard-change", renderAll);
-      document.addEventListener("syncetc:auth-soft-change", function () {
-        if (window.SyncEtc.SecurityContext && window.SyncEtc.SecurityContext.refresh) {
-          window.SyncEtc.SecurityContext.refresh(activeCustomerKey(shell)).then(renderAll).catch(renderAll);
-        } else {
-          renderAll();
-        }
-      });
-
-      if (window.SyncEtc.SecurityContext && window.SyncEtc.SecurityContext.refresh) {
-        window.SyncEtc.SecurityContext.refresh(activeCustomerKey(shell)).then(renderAll).catch(renderAll);
-      } else {
-        renderAll();
-      }
+      if (window.SyncEtc.SecurityContext && window.SyncEtc.SecurityContext.refresh) window.SyncEtc.SecurityContext.refresh(activeCustomerKey(shell)).then(renderAll).catch(renderAll);
+      else renderAll();
 
       console.log(VERSION + " loaded");
     }).catch(function (err) {
