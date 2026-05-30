@@ -7,7 +7,7 @@
 
   var VERSION = "COMPONENT-master-footer-v1";
   var SYNCETC_HOME_URL = "https://www.syncetc.com";
-  var SYNCETC_LOGO_URL = "https://ocdaohkiwonjmirqkjww.supabase.co/storage/v1/object/public/public-site-assets/!SyncEtc-branding/SyncEtc%20logo.png";
+  var SYNCETC_LOGO_URL = "https://ocdaohkiwonjmirqkjww.supabase.co/storage/v1/object/public/public-site-assets/!SyncEtc-branding/SyncEtc-logo-compact.png";
 
   function installStyles() {
     const U = window.SyncEtc.Components.Utils;
@@ -33,7 +33,7 @@
       }
       .aero-footer-bottom-grid {
         display:grid;
-        grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+        grid-template-columns:minmax(0,1.15fr) minmax(390px,1fr);
         gap:22px;
         align-items:center;
       }
@@ -48,18 +48,23 @@
         display:flex;
         align-items:center;
         justify-content:flex-end;
-        flex-wrap:wrap;
-        gap:12px;
+        flex-wrap:nowrap;
+        gap:14px;
         min-width:0;
       }
       .aero-footer-copyright {
-        min-width:220px;
-        max-width:360px;
-        color:rgba(255,255,255,.92);
+        flex:1 1 auto;
+        min-width:0;
+        color:rgba(255,255,255,.94);
         font-size:12px;
-        line-height:1.45;
+        line-height:1.35;
         font-weight:800;
         text-align:right;
+        white-space:normal;
+      }
+      .aero-footer-copyright-main,
+      .aero-footer-copyright-reserved {
+        display:inline;
       }
 
       .syncetc-powered-badge {
@@ -67,7 +72,7 @@
         align-items:center;
         justify-content:center;
         gap:10px;
-        min-height:48px;
+        min-height:52px;
         padding:8px 14px;
         border-radius:18px;
         background:rgba(255,255,255,.97);
@@ -88,9 +93,9 @@
       }
       .syncetc-powered-logo {
         display:block;
-        height:34px;
+        height:40px;
         width:auto;
-        max-width:150px;
+        max-width:220px;
         object-fit:contain;
       }
 
@@ -106,9 +111,12 @@
         .aero-footer-wrapper{padding-left:12px;padding-right:12px;}
         .aero-footer-top{padding:18px;}
         .aero-footer-bottom{padding:16px 18px;}
-        .aero-footer-legal-stack{align-items:flex-start;justify-content:flex-start;flex-direction:column;}
+        .aero-footer-legal-stack{align-items:stretch;justify-content:flex-start;flex-direction:column;}
+        .aero-footer-copyright{text-align:left;}
+        .aero-footer-copyright-main,
+        .aero-footer-copyright-reserved { display:block; }
         .syncetc-powered-badge{width:100%;justify-content:center;border-radius:16px;}
-        .syncetc-powered-logo{height:32px;max-width:160px;}
+        .syncetc-powered-logo{height:42px;max-width:240px;}
       }
     `);
   }
@@ -134,13 +142,26 @@
     return customer.legalName || customer.fullName || customer.customerName || customer.shortName || "Customer";
   }
 
-  function generatedCopyright(customer) {
-    if (customer.copyright) return String(customer.copyright);
-    var name = customerLegalName(customer);
+  function stripTerminalPeriod(value) {
+    return String(value || "").replace(/\s+$/g, "").replace(/[.。]+$/g, "");
+  }
+
+  function copyrightParts(customer) {
+    var name = stripTerminalPeriod(customerLegalName(customer));
     var now = currentYear();
     var start = parseYear(customer.copyrightStartYear || customer.customerStartYear || customer.signupYear || customer.createdYear);
     var yearText = start && start < now ? String(start) + "–" + String(now) : String(start || now);
-    return "© " + yearText + " " + name + ". All rights reserved.";
+    return {
+      main: "© " + yearText + " " + name + ".",
+      reserved: "All rights reserved."
+    };
+  }
+
+  function copyrightMarkup(customer) {
+    const U = window.SyncEtc.Components.Utils;
+    if (customer.copyright) return '<div class="aero-footer-copyright">' + U.esc(String(customer.copyright)) + '</div>';
+    var parts = copyrightParts(customer);
+    return '<div class="aero-footer-copyright"><span class="aero-footer-copyright-main">' + U.esc(parts.main) + '</span> <span class="aero-footer-copyright-reserved">' + U.esc(parts.reserved) + '</span></div>';
   }
 
   function poweredByMarkup() {
@@ -169,7 +190,7 @@
       <div class="aero-footer-bottom">
         <div class="aero-footer-bottom-grid">
           <p class="aero-footer-disclaimer">${U.esc(customer.footerDisclaimer || "Website materials are provided for customer communication and member convenience. Operational use is governed by current customer documents, applicable rules, and official procedures.")}</p>
-          <div class="aero-footer-legal-stack"><div class="aero-footer-copyright">${U.esc(generatedCopyright(customer))}</div>${poweredByMarkup()}</div>
+          <div class="aero-footer-legal-stack">${copyrightMarkup(customer)}${poweredByMarkup()}</div>
         </div>
       </div>
     </footer></section>`;
