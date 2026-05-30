@@ -93,9 +93,9 @@
       }
       .syncetc-powered-logo {
         display:block;
-        height:40px;
+        height:26px;
         width:auto;
-        max-width:220px;
+        max-width:150px;
         object-fit:contain;
       }
 
@@ -116,7 +116,7 @@
         .aero-footer-copyright-main,
         .aero-footer-copyright-reserved { display:block; }
         .syncetc-powered-badge{width:100%;justify-content:center;border-radius:16px;}
-        .syncetc-powered-logo{height:42px;max-width:240px;}
+        .syncetc-powered-logo{height:28px;max-width:170px;}
       }
     `);
   }
