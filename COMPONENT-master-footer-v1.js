@@ -25,45 +25,90 @@
       .aero-footer-kicker { display:inline-flex; margin-bottom:10px; padding:5px 10px; border-radius:999px; background:var(--se-aero-sky); color:var(--se-aero-navy); font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
       .aero-footer-link-grid, .aero-footer-social-grid { display:flex; flex-wrap:wrap; gap:8px; }
       .aero-footer-link, .aero-footer-social-link { display:inline-flex; align-items:center; justify-content:center; min-height:32px; padding:7px 11px; border-radius:999px; background:#fff; border:1px solid rgba(18,54,90,.16); color:var(--se-aero-navy); font-size:13px; font-weight:800; text-decoration:none; white-space:nowrap; }
-      .aero-footer-bottom { padding:15px 20px; background:linear-gradient(135deg,var(--se-aero-navy),var(--se-aero-blue)); color:rgba(255,255,255,.88); display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px; align-items:center; font-size:12px; line-height:1.55; font-weight:700; }
-      .aero-footer-disclaimer { margin:0; }
-      .aero-footer-legal-stack { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:10px; }
-      .aero-footer-copyright { white-space:nowrap; text-align:right; }
+
+      .aero-footer-bottom {
+        padding:16px 24px;
+        background:linear-gradient(135deg,var(--se-aero-navy),var(--se-aero-blue));
+        color:rgba(255,255,255,.90);
+      }
+      .aero-footer-bottom-grid {
+        display:grid;
+        grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+        gap:22px;
+        align-items:center;
+      }
+      .aero-footer-disclaimer {
+        margin:0;
+        max-width:620px;
+        font-size:12px;
+        line-height:1.5;
+        font-weight:700;
+      }
+      .aero-footer-legal-stack {
+        display:flex;
+        align-items:center;
+        justify-content:flex-end;
+        flex-wrap:wrap;
+        gap:12px;
+        min-width:0;
+      }
+      .aero-footer-copyright {
+        min-width:220px;
+        max-width:360px;
+        color:rgba(255,255,255,.92);
+        font-size:12px;
+        line-height:1.45;
+        font-weight:800;
+        text-align:right;
+      }
+
       .syncetc-powered-badge {
         display:inline-flex;
         align-items:center;
-        gap:8px;
-        min-height:34px;
-        padding:6px 10px;
-        border-radius:999px;
-        background:rgba(255,255,255,.96);
-        border:1px solid rgba(255,255,255,.75);
-        box-shadow:0 7px 18px rgba(8,22,38,.18);
+        justify-content:center;
+        gap:10px;
+        min-height:48px;
+        padding:8px 14px;
+        border-radius:18px;
+        background:rgba(255,255,255,.97);
+        border:1px solid rgba(255,255,255,.80);
+        box-shadow:0 8px 22px rgba(8,22,38,.18);
         color:#12365a !important;
         text-decoration:none;
-        font-size:11px;
-        font-weight:900;
         white-space:nowrap;
+        flex:0 0 auto;
       }
-      .syncetc-powered-badge:hover { transform:translateY(-1px); box-shadow:0 10px 24px rgba(8,22,38,.22); }
-      .syncetc-powered-badge span { color:#12365a; opacity:.88; }
+      .syncetc-powered-badge:hover { transform:translateY(-1px); box-shadow:0 11px 26px rgba(8,22,38,.24); }
+      .syncetc-powered-badge span {
+        color:#12365a;
+        opacity:.88;
+        font-size:11px;
+        font-weight:950;
+        line-height:1;
+      }
       .syncetc-powered-logo {
         display:block;
-        height:22px;
+        height:34px;
         width:auto;
-        max-width:94px;
+        max-width:150px;
         object-fit:contain;
       }
 
       @media (max-width:980px){
-        .aero-footer-top,.aero-footer-bottom{grid-template-columns:1fr;}
-        .aero-footer-copyright{text-align:left;white-space:normal;}
-        .aero-footer-legal-stack{justify-content:flex-start;}
+        .aero-footer-top{grid-template-columns:1fr;}
+        .aero-footer-bottom-grid{grid-template-columns:1fr;gap:14px;}
+        .aero-footer-legal-stack{justify-content:space-between;}
+        .aero-footer-copyright{text-align:left;max-width:none;}
+        .aero-footer-disclaimer{max-width:none;}
       }
 
       @media (max-width:720px){
         .aero-footer-wrapper{padding-left:12px;padding-right:12px;}
-        .syncetc-powered-badge{border-radius:16px;}
+        .aero-footer-top{padding:18px;}
+        .aero-footer-bottom{padding:16px 18px;}
+        .aero-footer-legal-stack{align-items:flex-start;justify-content:flex-start;flex-direction:column;}
+        .syncetc-powered-badge{width:100%;justify-content:center;border-radius:16px;}
+        .syncetc-powered-logo{height:32px;max-width:160px;}
       }
     `);
   }
@@ -90,7 +135,6 @@
   }
 
   function generatedCopyright(customer) {
-    const U = window.SyncEtc.Components.Utils;
     if (customer.copyright) return String(customer.copyright);
     var name = customerLegalName(customer);
     var now = currentYear();
@@ -122,7 +166,12 @@
           <div style="margin-top:16px"><div class="aero-footer-kicker">Member Links</div><div class="aero-footer-link-grid"><a class="aero-footer-link" data-se-page-link="member" href="#">Dashboard</a><a class="aero-footer-link" data-se-page-link="roster" href="#">Roster</a><a class="aero-footer-link" href="#">Forum</a><a class="aero-footer-link" data-se-page-link="documents" href="#">Resources</a></div></div>
         </div>
       </div>
-      <div class="aero-footer-bottom"><p class="aero-footer-disclaimer">${U.esc(customer.footerDisclaimer || "Website materials are provided for customer communication and member convenience. Operational use is governed by current customer documents, applicable rules, and official procedures.")}</p><div class="aero-footer-legal-stack"><div class="aero-footer-copyright">${U.esc(generatedCopyright(customer))}</div>${poweredByMarkup()}</div></div>
+      <div class="aero-footer-bottom">
+        <div class="aero-footer-bottom-grid">
+          <p class="aero-footer-disclaimer">${U.esc(customer.footerDisclaimer || "Website materials are provided for customer communication and member convenience. Operational use is governed by current customer documents, applicable rules, and official procedures.")}</p>
+          <div class="aero-footer-legal-stack"><div class="aero-footer-copyright">${U.esc(generatedCopyright(customer))}</div>${poweredByMarkup()}</div>
+        </div>
+      </div>
     </footer></section>`;
   }
 
