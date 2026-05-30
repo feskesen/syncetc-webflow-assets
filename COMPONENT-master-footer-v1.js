@@ -33,7 +33,7 @@
       }
       .aero-footer-bottom-grid {
         display:grid;
-        grid-template-columns:minmax(0,1.15fr) minmax(390px,1fr);
+        grid-template-columns:minmax(0,1.15fr) minmax(360px,1fr);
         gap:22px;
         align-items:center;
       }
@@ -64,7 +64,7 @@
       }
       .aero-footer-copyright-main,
       .aero-footer-copyright-reserved {
-        display:inline;
+        display:block;
       }
 
       .syncetc-powered-badge {
@@ -93,9 +93,9 @@
       }
       .syncetc-powered-logo {
         display:block;
-        height:26px;
+        height:21px;
         width:auto;
-        max-width:150px;
+        max-width:120px;
         object-fit:contain;
       }
 
@@ -116,7 +116,7 @@
         .aero-footer-copyright-main,
         .aero-footer-copyright-reserved { display:block; }
         .syncetc-powered-badge{width:100%;justify-content:center;border-radius:16px;}
-        .syncetc-powered-logo{height:28px;max-width:170px;}
+        .syncetc-powered-logo{height:22px;max-width:136px;}
       }
     `);
   }
