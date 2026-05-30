@@ -9,7 +9,7 @@
   function esc(v){return window.SyncEtc.Components.Utils.esc(v);}
 
   function installDrawerStyles(){
-    window.SyncEtc.Components.Utils.installStyle("COMPONENT-site-shell-v1-drawer-style",`
+    window.SyncEtc.Components.Utils.installStyle("COMPONENT-site-shell-v10-drawer-style",`
       .syncetc-admin-fab{position:fixed;right:18px;bottom:18px;z-index:99990;display:flex;gap:8px;align-items:center;border:2px solid rgba(255,255,255,.88);background:#b42318;color:#fff;border-radius:999px;padding:12px 15px;font-weight:950;font-size:13px;box-shadow:0 16px 38px rgba(12,38,64,.34),0 0 0 3px rgba(180,35,24,.18);cursor:pointer}
       .syncetc-admin-fab small{font-size:10px;font-weight:950;opacity:.92;text-transform:uppercase;letter-spacing:.05em}
       .syncetc-drawer-overlay{position:fixed;inset:0;background:rgba(8,22,38,.22);z-index:99991;opacity:0;pointer-events:none;transition:opacity .18s ease}
