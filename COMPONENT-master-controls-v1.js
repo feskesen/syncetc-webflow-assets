@@ -49,7 +49,7 @@ function getToken(){
   return "";
 }
 function nested(o,path,fallback){try{return path.split(".").reduce(function(a,k){return a&&a[k];},o)||fallback||"";}catch(e){return fallback||"";}}
-function installStyles(){U().installStyle("COMPONENT-master-controls-v17-style",`
+function installStyles(){U().installStyle("COMPONENT-master-controls-v1-style",`
     .syncetc-drawer .se-site-editor,
     .syncetc-drawer .se-site-editor *{box-sizing:border-box}
     .syncetc-drawer .se-site-editor{padding:0;background:transparent;font-family:inherit;color:#102034}
