@@ -165,11 +165,20 @@ function currentValues(api,schema){
   (schema.fields||[]).forEach(function(f){values[f.key]=fieldValue(f,local,defaults);});
   return values;
 }
+function setDeep(obj,path,value){
+  var parts=String(path||"").split(".").filter(Boolean);
+  if(!parts.length)return;
+  var cur=obj;
+  for(var i=0;i<parts.length-1;i++){
+    if(!cur[parts[i]]||typeof cur[parts[i]]!=="object"||Array.isArray(cur[parts[i]]))cur[parts[i]]={};
+    cur=cur[parts[i]];
+  }
+  cur[parts[parts.length-1]]=value;
+}
 function buildPayload(api,schema){
   var c=api.customer(), content=c.content||{}, local=api.getState().local||{}, values=currentValues(api,schema);
-  var pageKey=schema.pageKey||api.getState().pageKey||"page";
-  var contentOverrides=Object.assign({},content);
-  contentOverrides[pageKey]=Object.assign({},contentOverrides[pageKey]||{},values);
+  var contentOverrides=JSON.parse(JSON.stringify(content||{}));
+  Object.keys(values).forEach(function(k){setDeep(contentOverrides,k,values[k]);});
   return {
     customer_key:api.getState().customerKey,
     style_preset_key:local.stylePresetKey||c.stylePresetKey||"classic-aviation",
