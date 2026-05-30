@@ -9,7 +9,7 @@
   function esc(v){return window.SyncEtc.Components.Utils.esc(v);}
 
   function installDrawerStyles(){
-    window.SyncEtc.Components.Utils.installStyle("COMPONENT-site-shell-v1-drawer-style",`
+    window.SyncEtc.Components.Utils.installStyle("COMPONENT-site-shell-v10-drawer-style",`
       .syncetc-admin-fab{position:fixed;right:18px;bottom:18px;z-index:99990;display:flex;gap:8px;align-items:center;border:2px solid rgba(255,255,255,.88);background:#b42318;color:#fff;border-radius:999px;padding:12px 15px;font-weight:950;font-size:13px;box-shadow:0 16px 38px rgba(12,38,64,.34),0 0 0 3px rgba(180,35,24,.18);cursor:pointer}
       .syncetc-admin-fab small{font-size:10px;font-weight:950;opacity:.92;text-transform:uppercase;letter-spacing:.05em}
       .syncetc-drawer-overlay{position:fixed;inset:0;background:rgba(8,22,38,.22);z-index:99991;opacity:0;pointer-events:none;transition:opacity .18s ease}
@@ -39,7 +39,7 @@
   }
 
   function create(mountId,options){
-    var state=Object.assign({customerKey:"demo_flying_club",customerName:"Demo Flying Club",pageKey:"events",audience:"public",viewAs:"public",showControls:true,showBanner:false,siteEditorOpen:false,customerSettingsOpen:false,drawerOpen:false,drawerTab:"site",local:{},version:VERSION},options||{});
+    var state=Object.assign({customerKey:"demo_flying_club",customerName:"Demo Flying Club",pageKey:"events",audience:"public",viewAs:"public",showControls:true,showBanner:false,siteEditorOpen:false,customerSettingsOpen:false,drawerOpen:false,drawerTab:"site",local:{},version:VERSION,lastPageHtml:""},options||{});
     state.local=Object.assign({},state.local||{});
     var qs=new URLSearchParams(window.location.search), q=clean(qs.get("customer_key")||qs.get("customer"));
     if(q){state.customerKey=q;state.customerName=customerNameFromKey(q);}
@@ -56,47 +56,29 @@
     function setCustomerSettingsOpen(value){state.customerSettingsOpen=!!value;state.drawerOpen=!!value;if(value)state.drawerTab="customer";}
     function setDrawerOpen(value){state.drawerOpen=!!value;}
     function setDrawerTab(value){state.drawerTab=value||"site";}
+    function updateState(patch){
+      patch=patch||{};
+      Object.keys(patch).forEach(function(k){
+        if(k==="local") state.local=Object.assign({},state.local||{},patch.local||{});
+        else if(k==="customerName") state.customerName=patch.customerName||state.customerName;
+        else if(k==="customerKey") state.customerKey=patch.customerKey||state.customerKey;
+        else state[k]=patch[k];
+      });
+      if(!state.customerKey && state.customerName){
+        var n=String(state.customerName).toLowerCase();
+        if(n.indexOf("150th")>=0)state.customerKey="150th_aero";
+        else if(n.indexOf("demo")>=0)state.customerKey="demo_flying_club";
+      }
+    }
+    function refreshSecurityAndRender(){
+      if(!(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.refresh))return;
+      var key=state.customerKey||"demo_flying_club";
+      window.SyncEtc.SecurityContext.refresh(key).then(function(){ render(state.lastPageHtml||""); }).catch(function(){});
+    }
     function getState(){return JSON.parse(JSON.stringify(state));}
     function security(){return window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.getSnapshot?window.SyncEtc.SecurityContext.getSnapshot():{};}
-    function authSnapshot(){return window.SyncEtc.AuthContext&&window.SyncEtc.AuthContext.getSnapshot?window.SyncEtc.AuthContext.getSnapshot():{};}
-    function roleKey(v){return clean(v&&typeof v==="object"?(v.role_key||v.platform_role||v.active_customer_role_key||v.key||v.name):v).toLowerCase();}
-    function roleRank(v){var n=Number(v&&typeof v==="object"?(v.role_rank||v.rank):v);return isNaN(n)?0:n;}
-    function platformRoleHit(role){
-      var r=roleKey(role);
-      return r==="syncetc_super_admin"||r==="syncetc_platform_admin"||r==="platform_admin"||r==="super_admin"||r==="admin";
-    }
-    function customerRoleHit(role){
-      var r=roleKey(role);
-      return r==="customer_owner"||r==="customer_admin"||r==="customer_manager"||r==="owner"||r==="admin"||r==="manager"||roleRank(role)>=80;
-    }
-    function canSite(){
-      try{
-        var sec=security();
-        if(sec.is_syncetc_platform_admin||sec.is_syncetc_super_admin||platformRoleHit(sec.platform_role))return true;
-        if(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isPlatformAdmin&&window.SyncEtc.SecurityContext.isPlatformAdmin())return true;
-        var auth=authSnapshot();
-        if(auth.is_syncetc_super_admin)return true;
-        var roles=auth.platform_roles||[];
-        if(roles.some(platformRoleHit))return true;
-      }catch(e){}
-      return false;
-    }
-    function canCustomer(){
-      try{
-        if(canSite())return true;
-        var sec=security();
-        if(sec.active_customer_is_admin)return true;
-        if(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isCustomerAdmin&&window.SyncEtc.SecurityContext.isCustomerAdmin(state.customerKey))return true;
-        var auth=authSnapshot();
-        var active=auth.active_customer||{};
-        if(active.customer_key===state.customerKey&&customerRoleHit(active))return true;
-        var key=state.customerKey||auth.active_customer_key||"";
-        var memberships=auth.customer_memberships||[];
-        if(memberships.some(function(m){return (!key||m.customer_key===key)&&m.membership_status!=="inactive"&&customerRoleHit(m);}))return true;
-        if(customerRoleHit(auth.active_customer_role_key))return true;
-      }catch(e){}
-      return false;
-    }
+    function canSite(){return !!(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isPlatformAdmin&&window.SyncEtc.SecurityContext.isPlatformAdmin());}
+    function canCustomer(){return !!(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isCustomerAdmin&&window.SyncEtc.SecurityContext.isCustomerAdmin(state.customerKey));}
     function signOut(){if(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.signOutHard)window.SyncEtc.SecurityContext.signOutHard();}
 
     function getSavePayload(){
@@ -119,10 +101,7 @@
       if(!state.showControls||(!site&&!cust))return "";
       if(site && state.drawerTab!=="customer") state.drawerTab="site";
       if(!site && cust) state.drawerTab="customer";
-      var sec=security(), auth=authSnapshot(), user=auth.user||{}, active=auth.active_customer||{};
-      var actor=sec.actor_email||user.email||"";
-      var platformRole=sec.platform_role||(auth.platform_roles&&auth.platform_roles[0]&&auth.platform_roles[0].role_key)||"";
-      var customerRole=sec.active_customer_role||active.role_key||auth.active_customer_role_key||"";
+      var sec=security(), actor=sec.actor_email||"", platformRole=sec.platform_role||"", customerRole=sec.active_customer_role||"";
       var tab=state.drawerTab|| (site?"site":"customer");
       return `<button type="button" class="syncetc-admin-fab" data-se-drawer-open><span>Edit</span><small>${site?"platform":"customer"}</small></button>
         <div class="syncetc-drawer-overlay ${state.drawerOpen?"is-open":""}" data-se-drawer-close></div>
@@ -159,6 +138,7 @@
     }
 
     function render(pageHtml){
+      state.lastPageHtml=pageHtml||"";
       var C=window.SyncEtc.Components,U=C.Utils; C.BaseStyles.install();
       var c=customer(), shellId="syncetc-component-shell", audience=effectiveAudience();
       mount.innerHTML=`<div id="${shellId}" class="syncetc-shell" data-se-customer-key="${U.esc(state.customerKey)}" data-se-view-as="${U.esc(state.viewAs)}">${C.MasterHeader.render({customer:c,pageKey:state.pageKey,audience:audience,viewAs:state.viewAs})}<main data-se-page-body>${pageHtml||""}</main>${C.MasterFooter.render({customer:c,pageKey:state.pageKey,audience:audience,viewAs:state.viewAs})}${drawerHtml(c,audience)}</div>`;
@@ -169,7 +149,13 @@
       if(C.CustomerSettings)C.CustomerSettings.bind(api,shell);
     }
 
-    var api={render:render,customer:customer,loadCustomer:loadCustomer,getState:getState,setLocal:setLocal,setViewAs:setViewAs,setCustomerKey:setCustomerKey,setEditorOpen:setEditorOpen,setCustomerSettingsOpen:setCustomerSettingsOpen,setDrawerOpen:setDrawerOpen,setDrawerTab:setDrawerTab,getSavePayload:getSavePayload};
+    var authListenerInstalled=false;
+    if(!authListenerInstalled){
+      authListenerInstalled=true;
+      try{document.addEventListener("syncetc:auth-soft-change",function(){refreshSecurityAndRender();});}catch(e){}
+      setTimeout(refreshSecurityAndRender,50);
+    }
+    var api={render:render,customer:customer,loadCustomer:loadCustomer,getState:getState,updateState:updateState,setLocal:setLocal,setViewAs:setViewAs,setCustomerKey:setCustomerKey,setEditorOpen:setEditorOpen,setCustomerSettingsOpen:setCustomerSettingsOpen,setDrawerOpen:setDrawerOpen,setDrawerTab:setDrawerTab,getSavePayload:getSavePayload,refreshSecurityAndRender:refreshSecurityAndRender};
     return api;
   }
   window.SyncEtc.Components.SiteShell={create:create,version:VERSION};
