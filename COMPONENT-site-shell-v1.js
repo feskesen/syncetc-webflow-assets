@@ -9,7 +9,7 @@
   function esc(v){return window.SyncEtc.Components.Utils.esc(v);}
 
   function installDrawerStyles(){
-    window.SyncEtc.Components.Utils.installStyle("COMPONENT-site-shell-v10-drawer-style",`
+    window.SyncEtc.Components.Utils.installStyle("COMPONENT-site-shell-v1-drawer-style",`
       .syncetc-admin-fab{position:fixed;right:18px;bottom:18px;z-index:99990;display:flex;gap:8px;align-items:center;border:2px solid rgba(255,255,255,.88);background:#b42318;color:#fff;border-radius:999px;padding:12px 15px;font-weight:950;font-size:13px;box-shadow:0 16px 38px rgba(12,38,64,.34),0 0 0 3px rgba(180,35,24,.18);cursor:pointer}
       .syncetc-admin-fab small{font-size:10px;font-weight:950;opacity:.92;text-transform:uppercase;letter-spacing:.05em}
       .syncetc-drawer-overlay{position:fixed;inset:0;background:rgba(8,22,38,.22);z-index:99991;opacity:0;pointer-events:none;transition:opacity .18s ease}
@@ -58,8 +58,45 @@
     function setDrawerTab(value){state.drawerTab=value||"site";}
     function getState(){return JSON.parse(JSON.stringify(state));}
     function security(){return window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.getSnapshot?window.SyncEtc.SecurityContext.getSnapshot():{};}
-    function canSite(){return !!(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isPlatformAdmin&&window.SyncEtc.SecurityContext.isPlatformAdmin());}
-    function canCustomer(){return !!(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isCustomerAdmin&&window.SyncEtc.SecurityContext.isCustomerAdmin(state.customerKey));}
+    function authSnapshot(){return window.SyncEtc.AuthContext&&window.SyncEtc.AuthContext.getSnapshot?window.SyncEtc.AuthContext.getSnapshot():{};}
+    function roleKey(v){return clean(v&&typeof v==="object"?(v.role_key||v.platform_role||v.active_customer_role_key||v.key||v.name):v).toLowerCase();}
+    function roleRank(v){var n=Number(v&&typeof v==="object"?(v.role_rank||v.rank):v);return isNaN(n)?0:n;}
+    function platformRoleHit(role){
+      var r=roleKey(role);
+      return r==="syncetc_super_admin"||r==="syncetc_platform_admin"||r==="platform_admin"||r==="super_admin"||r==="admin";
+    }
+    function customerRoleHit(role){
+      var r=roleKey(role);
+      return r==="customer_owner"||r==="customer_admin"||r==="customer_manager"||r==="owner"||r==="admin"||r==="manager"||roleRank(role)>=80;
+    }
+    function canSite(){
+      try{
+        var sec=security();
+        if(sec.is_syncetc_platform_admin||sec.is_syncetc_super_admin||platformRoleHit(sec.platform_role))return true;
+        if(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isPlatformAdmin&&window.SyncEtc.SecurityContext.isPlatformAdmin())return true;
+        var auth=authSnapshot();
+        if(auth.is_syncetc_super_admin)return true;
+        var roles=auth.platform_roles||[];
+        if(roles.some(platformRoleHit))return true;
+      }catch(e){}
+      return false;
+    }
+    function canCustomer(){
+      try{
+        if(canSite())return true;
+        var sec=security();
+        if(sec.active_customer_is_admin)return true;
+        if(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isCustomerAdmin&&window.SyncEtc.SecurityContext.isCustomerAdmin(state.customerKey))return true;
+        var auth=authSnapshot();
+        var active=auth.active_customer||{};
+        if(active.customer_key===state.customerKey&&customerRoleHit(active))return true;
+        var key=state.customerKey||auth.active_customer_key||"";
+        var memberships=auth.customer_memberships||[];
+        if(memberships.some(function(m){return (!key||m.customer_key===key)&&m.membership_status!=="inactive"&&customerRoleHit(m);}))return true;
+        if(customerRoleHit(auth.active_customer_role_key))return true;
+      }catch(e){}
+      return false;
+    }
     function signOut(){if(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.signOutHard)window.SyncEtc.SecurityContext.signOutHard();}
 
     function getSavePayload(){
@@ -82,7 +119,10 @@
       if(!state.showControls||(!site&&!cust))return "";
       if(site && state.drawerTab!=="customer") state.drawerTab="site";
       if(!site && cust) state.drawerTab="customer";
-      var sec=security(), actor=sec.actor_email||"", platformRole=sec.platform_role||"", customerRole=sec.active_customer_role||"";
+      var sec=security(), auth=authSnapshot(), user=auth.user||{}, active=auth.active_customer||{};
+      var actor=sec.actor_email||user.email||"";
+      var platformRole=sec.platform_role||(auth.platform_roles&&auth.platform_roles[0]&&auth.platform_roles[0].role_key)||"";
+      var customerRole=sec.active_customer_role||active.role_key||auth.active_customer_role_key||"";
       var tab=state.drawerTab|| (site?"site":"customer");
       return `<button type="button" class="syncetc-admin-fab" data-se-drawer-open><span>Edit</span><small>${site?"platform":"customer"}</small></button>
         <div class="syncetc-drawer-overlay ${state.drawerOpen?"is-open":""}" data-se-drawer-close></div>
