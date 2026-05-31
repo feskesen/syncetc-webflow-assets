@@ -1,4 +1,4 @@
-/* COMPONENT-customer-style-v1.js | customer-owned page settings support | Generated: 2026-05-31 16:09:55 UTC */
+/* COMPONENT-customer-style-v1.js | passes baseline/current page settings | Generated: 2026-05-31 18:50:08 UTC */
 (function () {
   "use strict";
   window.SyncEtc = window.SyncEtc || {};

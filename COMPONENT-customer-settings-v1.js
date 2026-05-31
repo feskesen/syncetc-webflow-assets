@@ -1,4 +1,4 @@
-/* COMPONENT-customer-settings-v1.js | customer-owned Supabase page settings | Generated: 2026-05-31 16:09:55 UTC */
+/* COMPONENT-customer-settings-v1.js | baseline defaults + current values | Generated: 2026-05-31 18:50:08 UTC */
 (function(){
 "use strict";
 window.SyncEtc=window.SyncEtc||{};
@@ -135,7 +135,8 @@ function schemaFor(ctx){
     note:row.note||base.note,
     fields:fields,
     source_template_key:row.source_template_key||base.source_template_key,
-    getDefaults:function(){return row.settings_json||{};}
+    getDefaults:function(){return row.default_settings_json||row.baseline_settings_json||row.settings_json||{};},
+    getCurrentValues:function(){return row.current_settings_json||row.settings_json||{};}
   });
 }
 function defaultSchema(key){
@@ -191,8 +192,9 @@ function fieldDefault(field,defaults){
   if(Object.prototype.hasOwnProperty.call(field,"defaultValue"))return field.defaultValue;
   return "";
 }
-function fieldValue(field,local,defaults){
+function fieldValue(field,local,defaults,currentValues){
   if(local&&Object.prototype.hasOwnProperty.call(local,field.key))return local[field.key];
+  if(currentValues&&Object.prototype.hasOwnProperty.call(currentValues,field.key))return currentValues[field.key];
   return fieldDefault(field,defaults);
 }
 function defaultsForSchema(schema,ctx,api){
@@ -202,6 +204,12 @@ function defaultsForSchema(schema,ctx,api){
   var out={};
   (schema.fields||[]).forEach(function(f){out[f.key]=fieldDefault(f,{});});
   return out;
+}
+function currentValuesForSchema(schema,ctx,api){
+  try{
+    if(schema&&typeof schema.getCurrentValues==="function")return schema.getCurrentValues(ctx,api)||{};
+  }catch(e){}
+  return defaultsForSchema(schema,ctx,api);
 }
 function renderField(field,value,def){
   var tag=field.type==="textarea"?"textarea":"input";
@@ -217,7 +225,7 @@ function renderField(field,value,def){
 function render(ctx){
   installStyles();
   if(!canRender(ctx))return "";
-  var schema=schemaFor(ctx), local=ctx.local||{}, defaults=defaultsForSchema(schema,ctx,null);
+  var schema=schemaFor(ctx), local=ctx.local||{}, defaults=defaultsForSchema(schema,ctx,null), currentValues=currentValuesForSchema(schema,ctx,null);
   var sec=window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.getSnapshot?window.SyncEtc.SecurityContext.getSnapshot():{};
   var customerName=(ctx.customer&&ctx.customer.customerName)||(ctx.customer&&ctx.customer.shortName)||ctx.customerKey||"Customer";
   var open=ctx.customerSettingsOpen===true;
@@ -229,7 +237,7 @@ function render(ctx){
       currentSection=section;
       if(section)prefix='<div class="se-customer-settings-section">'+esc(section)+'</div>';
     }
-    return prefix+renderField(field,fieldValue(field,local,defaults),fieldDefault(field,defaults));
+    return prefix+renderField(field,fieldValue(field,local,defaults,currentValues),fieldDefault(field,defaults));
   }).join("");
   var manager="";
   if(schema.managerLink&&schema.managerLink.label){
@@ -301,6 +309,7 @@ function buildPayload(api,schema){
     page_label:schema.pageLabel||pageKey,
     note:schema.note||"",
     settings_json:values,
+    current_settings_json:values,
     fields_json:schema.fields||[],
     source_template_key:schema.source_template_key||null,
     is_enabled:true

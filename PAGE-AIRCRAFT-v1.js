@@ -1,4 +1,4 @@
-/* PAGE-AIRCRAFT-v1.js | customer-owned Supabase page settings | Generated: 2026-05-31 16:09:55 UTC */
+/* PAGE-AIRCRAFT-v1.js | baseline defaults + current Supabase values | Generated: 2026-05-31 18:50:08 UTC */
 (function () {
   "use strict";
 
@@ -221,7 +221,7 @@
       if(!cs||!cs.getCustomerConfig)return null;
       var customer=cs.getCustomerConfig(customerKey);
       var row=cs.pageSettingsFor?cs.pageSettingsFor(customer,"aircraft"):((customer.customerPageSettingsByKey||{}).aircraft);
-      return row&&row.settings_json?row.settings_json:null;
+      return row&&(row.current_settings_json||row.settings_json)?(row.current_settings_json||row.settings_json):null;
     }catch(e){return null;}
   }
 
@@ -280,6 +280,8 @@
       getDefaults:function(ctx,api) {
         var key = (api && api.getState && api.getState().customerKey) || (ctx && ctx.customerKey) || "150th_aero";
         var db = customerAircraftSettings(key);
+        var rowDb=(function(){try{var cs=window.SyncEtc&&window.SyncEtc.Components&&window.SyncEtc.Components.CustomerStyle;var customer=cs&&cs.getCustomerConfig?cs.getCustomerConfig(key):null;var row=cs&&cs.pageSettingsFor?cs.pageSettingsFor(customer,"aircraft"):null;return row&&(row.default_settings_json||row.baseline_settings_json)?(row.default_settings_json||row.baseline_settings_json):null;}catch(e){return null;}})();
+        if(rowDb) return rowDb;
         if(db) return db;
         var cfg = baseConfig(key);
         return {
