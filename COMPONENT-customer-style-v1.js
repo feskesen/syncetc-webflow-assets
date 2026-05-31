@@ -1,4 +1,4 @@
-/* COMPONENT-customer-style-v1.js - BEGIN */
+/* COMPONENT-customer-style-v1.js | Supabase layout presets support | Generated: 2026-05-31 08:08:19 UTC */
 (function () {
   "use strict";
   window.SyncEtc = window.SyncEtc || {};
@@ -15,6 +15,14 @@
     { preset_key:"clean-club", preset_name:"Clean Club", theme:{ navy:"#24415f", navyDark:"#13283d", blue:"#4c8fc7", sky:"#f3f9ff", text:"#23313d", muted:"#657381" }, layout:{} },
     { preset_key:"bold-banner", preset_name:"Bold Banner", theme:{ navy:"#0f2f57", navyDark:"#081d36", blue:"#1f78bd", sky:"#e6f4ff", text:"#182635", muted:"#566879" }, layout:{} }
   ];
+
+  var FALLBACK_LAYOUT_PRESETS=[
+    {layout_key:"standard-layout",layout_name:"Standard Layout",description:"Balanced default layout for most customer sites.",layout:{preset:"standard-layout",density:"normal",heroSize:"standard",maxWidth:"normal",cardStyle:"standard",navDensity:"normal",buttonShape:"rounded",sectionSpacing:"normal"},sort_order:10},
+    {layout_key:"compact-ops",layout_name:"Compact Ops",description:"Denser operational layout for fast scanning.",layout:{preset:"compact-ops",density:"compact",heroSize:"small",maxWidth:"normal",cardStyle:"compact",navDensity:"compact",buttonShape:"rounded",sectionSpacing:"tight"},sort_order:20},
+    {layout_key:"bold-homepage",layout_name:"Bold Homepage",description:"Larger home-page-forward layout.",layout:{preset:"bold-homepage",density:"normal",heroSize:"large",maxWidth:"wide",cardStyle:"prominent",navDensity:"normal",buttonShape:"pill",sectionSpacing:"generous"},sort_order:30},
+    {layout_key:"club-magazine",layout_name:"Club Magazine",description:"Editorial image-forward club presentation.",layout:{preset:"club-magazine",density:"comfortable",heroSize:"large",maxWidth:"wide",cardStyle:"editorial",navDensity:"normal",buttonShape:"soft",sectionSpacing:"generous"},sort_order:40}
+  ];
+
 
   var DEFAULT_CUSTOMERS = {
     "demo_flying_club": { customer_key:"demo_flying_club", customerName:"Demo Flying Club", shortName:"Demo Flying Club", fullName:"Demo Flying Club", legalName:"Demo Flying Club", founded:"Demo Customer", announcement:"Demo site editor preview.", footerText:"Demo customer footer text.", social:{}, theme:FALLBACK_PRESETS[0].theme },
@@ -34,11 +42,13 @@
     var bundle=cache[key] || {};
     var settings=bundle.settings || {};
     var presets=bundle.presets && bundle.presets.length ? bundle.presets : FALLBACK_PRESETS;
+    var layoutPresets=bundle.layout_presets && bundle.layout_presets.length ? bundle.layout_presets : ((bundle.layoutPresets && bundle.layoutPresets.length) ? bundle.layoutPresets : FALLBACK_LAYOUT_PRESETS);
     var presetKey=overrides.stylePresetKey || settings.style_preset_key || "classic-aviation";
     var preset=presetByKey(presets,presetKey);
     var cfg=deepMerge(base, settings.brand_overrides || {});
     cfg.customer_key=key;
     cfg.availablePresets=presets;
+    cfg.availableLayoutPresets=layoutPresets;
     cfg.stylePresetKey=preset.preset_key;
     cfg.preset=preset.preset_name;
     cfg.theme=deepMerge(preset.theme || {}, settings.theme_overrides || {});
@@ -76,6 +86,6 @@
 
   function applyCustomerCssVars(rootEl, customerConfig){ applyThemeVars(rootEl,(customerConfig&&customerConfig.theme)||FALLBACK_PRESETS[0].theme); }
 
-  window.SyncEtc.Components.CustomerStyle={version:VERSION,customers:DEFAULT_CUSTOMERS,fallbackPresets:FALLBACK_PRESETS,getCustomerConfig:getCustomerConfig,loadCustomerConfig:loadCustomerConfig,themeForPreset:themeForPreset,applyThemeVars:applyThemeVars,applyCustomerCssVars:applyCustomerCssVars};
+  window.SyncEtc.Components.CustomerStyle={version:VERSION,customers:DEFAULT_CUSTOMERS,fallbackPresets:FALLBACK_PRESETS,fallbackLayoutPresets:FALLBACK_LAYOUT_PRESETS,getCustomerConfig:getCustomerConfig,loadCustomerConfig:loadCustomerConfig,themeForPreset:themeForPreset,applyThemeVars:applyThemeVars,applyCustomerCssVars:applyCustomerCssVars};
 })();
 /* COMPONENT-customer-style-v1.js - END */
