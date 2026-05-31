@@ -1,4 +1,4 @@
-/* COMPONENT-customer-style-v1.js | Supabase layout presets support | Generated: 2026-05-31 08:08:19 UTC */
+/* COMPONENT-customer-style-v1.js | visible layout preset variables | Generated: 2026-05-31 08:15:12 UTC */
 (function () {
   "use strict";
   window.SyncEtc = window.SyncEtc || {};
@@ -33,6 +33,12 @@
   function keyFromName(v){ var raw=clean(v); if(raw==="150th Aero Flying Club"||raw==="150th Aero") return "150th_aero"; if(raw==="Demo Flying Club") return "demo_flying_club"; return raw || "demo_flying_club"; }
   function deepMerge(a,b){ var out=Object.assign({},a||{}); Object.keys(b||{}).forEach(function(k){ if(b[k]&&typeof b[k]==="object"&&!Array.isArray(b[k])&&out[k]&&typeof out[k]==="object"&&!Array.isArray(out[k])) out[k]=deepMerge(out[k],b[k]); else out[k]=b[k]; }); return out; }
   function presetByKey(presets,key){ return (presets||FALLBACK_PRESETS).find(function(p){return clean(p.preset_key)===clean(key);}) || FALLBACK_PRESETS[0]; }
+  function layoutPresetByKey(layoutPresets,key){ return (layoutPresets||FALLBACK_LAYOUT_PRESETS).find(function(p){return clean(p.layout_key||p.preset_key||p.key)===clean(key);}) || FALLBACK_LAYOUT_PRESETS[0]; }
+  function savedLayoutKey(settings,overrides){
+    if(overrides&&overrides.layoutPresetKey)return overrides.layoutPresetKey;
+    var mo=(settings&&settings.module_overrides)||{};
+    return (mo.layout&&mo.layout.preset)||"standard-layout";
+  }
   function fallbackConfig(customerKeyOrName){ var key=keyFromName(customerKeyOrName); return Object.assign({}, DEFAULT_CUSTOMERS[key] || { customer_key:key, customerName:key.replace(/_/g," "), shortName:key.replace(/_/g," "), fullName:key.replace(/_/g," "), legalName:key.replace(/_/g," "), founded:"Customer Site", announcement:"", social:{}, theme:FALLBACK_PRESETS[0].theme }); }
 
   function getCustomerConfig(customerKeyOrName, overrides){
@@ -51,6 +57,12 @@
     cfg.availableLayoutPresets=layoutPresets;
     cfg.stylePresetKey=preset.preset_key;
     cfg.preset=preset.preset_name;
+    var layoutKey=savedLayoutKey(settings,overrides);
+    var layoutPreset=layoutPresetByKey(layoutPresets,layoutKey);
+    cfg.layoutPresetKey=layoutPreset.layout_key||layoutKey;
+    cfg.layoutPresetName=layoutPreset.layout_name||layoutKey;
+    cfg.layout=deepMerge(layoutPreset.layout||{},((settings.module_overrides||{}).layout||{}));
+    cfg.layout.preset=layoutKey;
     cfg.theme=deepMerge(preset.theme || {}, settings.theme_overrides || {});
     cfg.content=deepMerge(settings.content_overrides || {}, overrides.content || {});
     cfg.modules=settings.enabled_modules || {};
@@ -84,8 +96,78 @@
     target.style.setProperty("--se-aero-muted",theme.muted||"#5d6b78");
   }
 
-  function applyCustomerCssVars(rootEl, customerConfig){ applyThemeVars(rootEl,(customerConfig&&customerConfig.theme)||FALLBACK_PRESETS[0].theme); }
+  function ensureLayoutStyles(){
+    if(document.getElementById("syncetc-layout-preset-visible-vars"))return;
+    var style=document.createElement("style");
+    style.id="syncetc-layout-preset-visible-vars";
+    style.textContent=[
+      ".syncetc-shell{max-width:var(--se-layout-shell-max,1180px)!important;margin-left:auto!important;margin-right:auto!important;}",
+      ".syncetc-shell main{display:block!important;}",
+      ".syncetc-shell section{margin-bottom:var(--se-layout-section-gap,24px)!important;}",
+      ".syncetc-shell button:not(.syncetc-admin-fab):not(.se-top-signout):not(.se-toggle){border-radius:var(--se-layout-button-radius,999px)!important;}",
+      ".syncetc-shell .club-header-card,.syncetc-shell [class*='card'],.syncetc-shell [class*='panel'],.syncetc-shell [class*='tile'],.syncetc-shell [class*='stat'],.syncetc-shell [class*='hero'],.syncetc-shell [class*='section']{border-radius:var(--se-layout-card-radius,18px)!important;box-shadow:var(--se-layout-card-shadow,none)!important;}",
+      ".syncetc-shell [class*='hero']{min-height:var(--se-layout-hero-min,auto)!important;padding-top:var(--se-layout-hero-pad-y,inherit)!important;padding-bottom:var(--se-layout-hero-pad-y,inherit)!important;}",
+      ".syncetc-shell .club-header-wrapper{padding-top:var(--se-layout-nav-pad-y,inherit)!important;padding-bottom:var(--se-layout-nav-pad-y,inherit)!important;}"
+    ].join("");
+    document.head.appendChild(style);
+  }
 
-  window.SyncEtc.Components.CustomerStyle={version:VERSION,customers:DEFAULT_CUSTOMERS,fallbackPresets:FALLBACK_PRESETS,fallbackLayoutPresets:FALLBACK_LAYOUT_PRESETS,getCustomerConfig:getCustomerConfig,loadCustomerConfig:loadCustomerConfig,themeForPreset:themeForPreset,applyThemeVars:applyThemeVars,applyCustomerCssVars:applyCustomerCssVars};
+  function sizeValue(v,normal,wide,narrow){
+    if(v==="wide")return wide;
+    if(v==="narrow")return narrow;
+    return normal;
+  }
+
+  function applyLayoutVars(rootEl,layout){
+    ensureLayoutStyles();
+    var target=rootEl || document.documentElement;
+    layout=layout||{};
+    var radius="18px", buttonRadius="999px", shadow="none", gap="24px", heroMin="auto", heroPad="inherit", shellMax="1180px", navPad="inherit";
+
+    if(layout.buttonShape==="square")buttonRadius="4px";
+    else if(layout.buttonShape==="soft")buttonRadius="14px";
+    else if(layout.buttonShape==="pill")buttonRadius="999px";
+    else if(layout.buttonShape==="rounded")buttonRadius="12px";
+
+    if(layout.cardStyle==="square"||layout.cardStyle==="sharp")radius="4px";
+    else if(layout.cardStyle==="soft")radius="22px";
+    else if(layout.cardStyle==="prominent")radius="26px";
+    else if(layout.cardStyle==="editorial")radius="30px";
+    else if(layout.cardStyle==="compact")radius="10px";
+
+    if(layout.shadow==="deep")shadow="0 18px 40px rgba(15,23,42,.22)";
+    else if(layout.shadow==="medium")shadow="0 10px 24px rgba(15,23,42,.14)";
+    else if(layout.shadow==="soft")shadow="0 8px 22px rgba(15,23,42,.10)";
+    else if(layout.shadow==="flat")shadow="none";
+
+    if(layout.sectionSpacing==="tight")gap="14px";
+    else if(layout.sectionSpacing==="generous")gap="36px";
+    else if(layout.sectionSpacing==="wide")gap="48px";
+
+    if(layout.heroSize==="small"){heroMin="160px";heroPad="24px";}
+    else if(layout.heroSize==="large"){heroMin="360px";heroPad="56px";}
+    else if(layout.heroSize==="xl"){heroMin="460px";heroPad="76px";}
+    else {heroMin="240px";heroPad="36px";}
+
+    shellMax=sizeValue(layout.maxWidth,"1180px","1380px","980px");
+    if(layout.navDensity==="compact")navPad="4px";
+    else if(layout.navDensity==="roomy")navPad="16px";
+
+    target.style.setProperty("--se-layout-card-radius",radius);
+    target.style.setProperty("--se-layout-button-radius",buttonRadius);
+    target.style.setProperty("--se-layout-card-shadow",shadow);
+    target.style.setProperty("--se-layout-section-gap",gap);
+    target.style.setProperty("--se-layout-hero-min",heroMin);
+    target.style.setProperty("--se-layout-hero-pad-y",heroPad);
+    target.style.setProperty("--se-layout-shell-max",shellMax);
+    target.style.setProperty("--se-layout-nav-pad-y",navPad);
+  }
+
+  function applyCustomerCssVars(rootEl, customerConfig){
+    applyThemeVars(rootEl,(customerConfig&&customerConfig.theme)||FALLBACK_PRESETS[0].theme);
+    applyLayoutVars(rootEl,(customerConfig&&customerConfig.layout)||FALLBACK_LAYOUT_PRESETS[0].layout);
+  }
+
+  window.SyncEtc.Components.CustomerStyle={version:VERSION,customers:DEFAULT_CUSTOMERS,fallbackPresets:FALLBACK_PRESETS,fallbackLayoutPresets:FALLBACK_LAYOUT_PRESETS,getCustomerConfig:getCustomerConfig,loadCustomerConfig:loadCustomerConfig,themeForPreset:themeForPreset,applyThemeVars:applyThemeVars,applyLayoutVars:applyLayoutVars,applyCustomerCssVars:applyCustomerCssVars};
 })();
 /* COMPONENT-customer-style-v1.js - END */
