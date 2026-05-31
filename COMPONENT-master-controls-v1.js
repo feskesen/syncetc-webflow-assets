@@ -1,4 +1,4 @@
-/* COMPONENT-master-controls-v1.js | Supabase layout presets dropdown | Generated: 2026-05-31 08:08:19 UTC */
+/* COMPONENT-master-controls-v1.js | immediate layout preset preview | Generated: 2026-05-31 08:33:49 UTC */
 /* COMPONENT-master-controls-v1.js - BEGIN */
 (function(){
 "use strict";
@@ -384,6 +384,33 @@ function bind(api,root){
     }
   });
 }
+
+function findLayoutPresetForPreview(customerConfig,key){
+  var list=(customerConfig&&customerConfig.availableLayoutPresets)||[];
+  if((!list||!list.length)&&window.SyncEtc&&window.SyncEtc.Components&&window.SyncEtc.Components.CustomerStyle){
+    list=window.SyncEtc.Components.CustomerStyle.fallbackLayoutPresets||[];
+  }
+  key=clean(key);
+  for(var i=0;i<list.length;i++){
+    var item=list[i]||{};
+    var k=clean(item.layout_key||item.preset_key||item.key);
+    if(k===key)return item;
+  }
+  return list&&list.length?list[0]:{layout_key:"standard-layout",layout_name:"Standard Layout",layout:{preset:"standard-layout"}};
+}
+
+function previewLayoutPreset(api,value){
+  try{
+    var c=api.customer?api.customer():{};
+    var item=findLayoutPresetForPreview(c,value);
+    var layout=Object.assign({},item.layout||{});
+    layout.preset=value||layout.preset||item.layout_key||"standard-layout";
+    if(window.SyncEtc&&window.SyncEtc.Components&&window.SyncEtc.Components.CustomerStyle&&window.SyncEtc.Components.CustomerStyle.applyLayoutVars){
+      window.SyncEtc.Components.CustomerStyle.applyLayoutVars(document.getElementById("syncetc-component-shell"),layout);
+    }
+  }catch(err){}
+}
+
 function handleLocal(api,editor,t){
   var field=t.getAttribute("data-se-local"),value=t.value;
   api.setLocal(field,value);
@@ -396,7 +423,8 @@ function handleLocal(api,editor,t){
   }
 
   if(field==="layoutPresetKey"){
-    markStatus(editor,"Unsaved layout preset change. Click Save Site Settings to persist.","warn");
+    previewLayoutPreset(api,value);
+    markStatus(editor,"Unsaved layout preset change previewing on the page. Click Save Site Settings to persist.","warn");
   }
 }
 window.SyncEtc.Components.MasterControls={version:VERSION,render:render,bind:bind,installStyles:installStyles};
