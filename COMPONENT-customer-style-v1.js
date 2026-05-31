@@ -1,4 +1,4 @@
-/* COMPONENT-customer-style-v1.js | Plain Jane visual variable support | Generated: 2026-05-31 20:27:07 UTC */
+/* COMPONENT-customer-style-v1.js | generic preset cssVars support | Generated: 2026-05-31 20:45:06 UTC */
 (function () {
   "use strict";
   window.SyncEtc = window.SyncEtc || {};
@@ -112,6 +112,7 @@
     target.style.setProperty("--se-aero-border",theme.border||"rgba(18,54,90,.16)");
     target.style.setProperty("--se-aero-page",theme.page||theme.pageBackground||"#ffffff");
     target.style.setProperty("--se-aero-soft",theme.soft||theme.softBackground||theme.sky||"#f8fafc");
+    applyCssVarsObject(target,theme.cssVars||theme.css_vars);
   }
 
   function ensureLayoutStyles(){
