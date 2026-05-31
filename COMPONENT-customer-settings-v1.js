@@ -1,4 +1,4 @@
-/* COMPONENT-customer-settings-v1.js - BEGIN | Side drawer typing debounce fix */
+/* COMPONENT-customer-settings-v1.js - BEGIN | typing debounce + unsaved warning + field mode groundwork */
 (function(){
 "use strict";
 window.SyncEtc=window.SyncEtc||{};
@@ -7,6 +7,29 @@ var VERSION="COMPONENT-customer-settings-v1";
 var ACTION_URL="https://ocdaohkiwonjmirqkjww.supabase.co/functions/v1/syncetc-site-settings-action";
 
 var registry={};
+var hasUnsavedCustomerSettings=false;
+var beforeUnloadInstalled=false;
+
+function ensureBeforeUnloadProtection(){
+  if(beforeUnloadInstalled)return;
+  beforeUnloadInstalled=true;
+  window.addEventListener("beforeunload",function(e){
+    if(!hasUnsavedCustomerSettings)return;
+    e.preventDefault();
+    e.returnValue="";
+    return "";
+  });
+}
+
+function markDirty(){
+  hasUnsavedCustomerSettings=true;
+  ensureBeforeUnloadProtection();
+}
+
+function markClean(){
+  hasUnsavedCustomerSettings=false;
+}
+
 
 function U(){return window.SyncEtc.Components.Utils;}
 function esc(v){return U().esc(v);}
@@ -50,6 +73,7 @@ function installStyles(){
     .se-customer-settings-control input,.se-customer-settings-control textarea,.se-customer-settings-control select{width:100%;border:1px solid rgba(18,54,90,.20);border-radius:11px;padding:9px 10px;font:inherit;font-size:13px;background:#fff;color:#102034;box-sizing:border-box}
     .se-customer-settings-control textarea{min-height:78px;resize:vertical}
     .se-customer-settings-control small{display:block;margin-top:4px;color:#64748b;font-size:11px;line-height:1.35}
+    .se-customer-settings-mode{margin-top:4px;padding-top:8px;border-top:1px dashed rgba(18,54,90,.16)}
     .se-customer-settings-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
     .se-customer-settings-actions button,.se-manager-link{border:1px solid rgba(18,54,90,.20);border-radius:999px;padding:9px 11px;background:#12365a;color:#fff!important;font-weight:900;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
     .se-customer-settings-actions button.secondary,.se-manager-link.secondary{background:#fff;color:#12365a!important}
@@ -80,13 +104,16 @@ function defaultsForSchema(schema,ctx,api){
   (schema.fields||[]).forEach(function(f){out[f.key]=fieldDefault(f,{});});
   return out;
 }
-function renderField(field,value,def){
+function renderField(field,value,def,mode){
   var tag=field.type==="textarea"?"textarea":"input";
+  mode=mode||"default";
   var help=field.help?'<small>'+esc(field.help)+'</small>':('<small>Default: '+esc(def)+'</small>');
+  var modeHelp='<small>Mode: Default uses SyncEtc text. Custom uses this field. Hidden is saved for pages that support hiding this item.</small>';
+  var modeSelect='<label class="se-customer-settings-control se-customer-settings-mode"><span>'+esc(field.label||field.key)+' Mode</span><select data-cs-mode-for="'+esc(field.key)+'"><option value="default" '+(mode==="default"?"selected":"")+'>Use default</option><option value="custom" '+(mode==="custom"?"selected":"")+'>Custom text</option><option value="hidden" '+(mode==="hidden"?"selected":"")+'>Hide this field</option></select>'+modeHelp+'</label>';
   if(tag==="textarea"){
-    return '<label class="se-customer-settings-control"><span>'+esc(field.label||field.key)+'</span><textarea data-cs-local="'+esc(field.key)+'">'+esc(value)+'</textarea>'+help+'</label>';
+    return modeSelect+'<label class="se-customer-settings-control"><span>'+esc(field.label||field.key)+'</span><textarea data-cs-local="'+esc(field.key)+'">'+esc(value)+'</textarea>'+help+'</label>';
   }
-  return '<label class="se-customer-settings-control"><span>'+esc(field.label||field.key)+'</span><input data-cs-local="'+esc(field.key)+'" value="'+esc(value)+'">'+help+'</label>';
+  return modeSelect+'<label class="se-customer-settings-control"><span>'+esc(field.label||field.key)+'</span><input data-cs-local="'+esc(field.key)+'" value="'+esc(value)+'">'+help+'</label>';
 }
 function render(ctx){
   installStyles();
@@ -103,7 +130,9 @@ function render(ctx){
       currentSection=section;
       if(section)prefix='<div class="se-customer-settings-section">'+esc(section)+'</div>';
     }
-    return prefix+renderField(field,fieldValue(field,local,defaults),fieldDefault(field,defaults));
+    var modeKey=field.key+".__mode";
+    var mode=(local&&local[modeKey])?local[modeKey]:(local&&Object.prototype.hasOwnProperty.call(local,field.key)?"custom":"default");
+    return prefix+renderField(field,fieldValue(field,local,defaults),fieldDefault(field,defaults),mode);
   }).join("");
   var manager="";
   if(schema.managerLink&&schema.managerLink.label){
@@ -168,8 +197,13 @@ function currentValues(api,schema){
 function buildPayload(api,schema){
   var c=api.customer(), content=c.content||{}, local=api.getState().local||{}, values=currentValues(api,schema);
   var pageKey=schema.pageKey||api.getState().pageKey||"page";
+  var modes={};
+  (schema.fields||[]).forEach(function(f){
+    var modeKey=f.key+".__mode";
+    modes[f.key]=(local&&local[modeKey])?local[modeKey]:(local&&Object.prototype.hasOwnProperty.call(local,f.key)?"custom":"default");
+  });
   var contentOverrides=Object.assign({},content);
-  contentOverrides[pageKey]=Object.assign({},contentOverrides[pageKey]||{},values);
+  contentOverrides[pageKey]=Object.assign({},contentOverrides[pageKey]||{},values,{__field_modes:modes});
   return {
     customer_key:api.getState().customerKey,
     style_preset_key:local.stylePresetKey||c.stylePresetKey||"classic-aviation",
@@ -187,7 +221,7 @@ function save(api,root,schema){
   setStatus(root,"Saving...","");
   fetch(ACTION_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({action:"save_customer_page_settings",payload:buildPayload(api,schema)})})
   .then(function(r){return r.json().catch(function(){return null;}).then(function(body){if(!r.ok||!body||body.ok===false)throw new Error((body&&body.error)||"Save failed");return body;});})
-  .then(function(){setStatus(root,"Saved customer page settings.","good");})
+  .then(function(){markClean();setStatus(root,"Saved customer page settings.","good");})
   .catch(function(err){setStatus(root,"Save failed: "+(err.message||err),"warn");});
 }
 function setStatus(root,msg,cls){
@@ -207,6 +241,7 @@ function bind(api,root){
   var box=root.querySelector("[data-se-customer-settings]");
   if(!box||box.getAttribute("data-cs-bound")==="1")return;
   box.setAttribute("data-cs-bound","1");
+  ensureBeforeUnloadProtection();
   var schema=schemaFor({pageKey:api.getState().pageKey,customerKey:api.getState().customerKey,customer:api.customer(),local:api.getState().local});
   var restoreBackup=null;
   var typingTimer=null;
@@ -227,6 +262,12 @@ function bind(api,root){
     dispatchLocalChange(schema,api);
   }
 
+  function currentModeForField(field){
+    var local=api.getState().local||{};
+    var modeKey=field+".__mode";
+    return local[modeKey]||"custom";
+  }
+
   box.addEventListener("click",function(e){
     if(e.target.closest("[data-cs-save]")){
       if(typingTimer){
@@ -239,15 +280,22 @@ function bind(api,root){
     if(e.target.closest("[data-cs-restore]")){
       var local=api.getState().local||{};
       restoreBackup={};
-      (schema.fields||[]).forEach(function(f){restoreBackup[f.key]=local[f.key];});
+      (schema.fields||[]).forEach(function(f){
+        restoreBackup[f.key]=local[f.key];
+        restoreBackup[f.key+".__mode"]=local[f.key+".__mode"];
+      });
       var defaults=defaultsForSchema(schema,{customer:api.customer(),customerKey:api.getState().customerKey,pageKey:schema.pageKey,local:local},api);
       (schema.fields||[]).forEach(function(f){
         var v=fieldDefault(f,defaults);
         if(defaults&&Object.prototype.hasOwnProperty.call(defaults,f.key))v=defaults[f.key];
         api.setLocal(f.key,v);
+        api.setLocal(f.key+".__mode","default");
         setInput(box,f.key,v);
+        var modeEl=box.querySelector('[data-cs-mode-for="'+CSS.escape(f.key)+'"]');
+        if(modeEl)modeEl.value="default";
       });
       var undo=box.querySelector("[data-cs-undo]");if(undo)undo.disabled=false;
+      markDirty();
       flushPreviewUpdate();
       setStatus(box,"Defaults restored locally. Save to persist.","");
       return;
@@ -256,16 +304,28 @@ function bind(api,root){
       if(!restoreBackup)return;
       (schema.fields||[]).forEach(function(f){
         var v=restoreBackup[f.key]||"";
+        var mode=restoreBackup[f.key+".__mode"]||"custom";
         api.setLocal(f.key,v);
+        api.setLocal(f.key+".__mode",mode);
         setInput(box,f.key,v);
+        var modeEl=box.querySelector('[data-cs-mode-for="'+CSS.escape(f.key)+'"]');
+        if(modeEl)modeEl.value=mode;
       });
       e.target.disabled=true;
+      markDirty();
       flushPreviewUpdate();
       setStatus(box,"Restore undone locally. Save to persist.","");
       return;
     }
     if(e.target.closest("[data-cs-clear]")){
-      (schema.fields||[]).forEach(function(f){api.setLocal(f.key,"");setInput(box,f.key,"");});
+      (schema.fields||[]).forEach(function(f){
+        api.setLocal(f.key,"");
+        api.setLocal(f.key+".__mode","custom");
+        setInput(box,f.key,"");
+        var modeEl=box.querySelector('[data-cs-mode-for="'+CSS.escape(f.key)+'"]');
+        if(modeEl)modeEl.value="custom";
+      });
+      markDirty();
       flushPreviewUpdate();
       setStatus(box,"Copy fields cleared locally. Save to persist.","");
       return;
@@ -276,13 +336,27 @@ function bind(api,root){
     var field=e.target&&e.target.getAttribute&&e.target.getAttribute("data-cs-local");
     if(!field)return;
     api.setLocal(field,e.target.value);
+    if(currentModeForField(field)==="default")api.setLocal(field+".__mode","custom");
+    var modeEl=box.querySelector('[data-cs-mode-for="'+CSS.escape(field)+'"]');
+    if(modeEl&&modeEl.value==="default")modeEl.value="custom";
+    markDirty();
     schedulePreviewUpdate();
   });
 
   box.addEventListener("change",function(e){
     var field=e.target&&e.target.getAttribute&&e.target.getAttribute("data-cs-local");
+    var modeFor=e.target&&e.target.getAttribute&&e.target.getAttribute("data-cs-mode-for");
+    if(modeFor){
+      api.setLocal(modeFor+".__mode",e.target.value);
+      markDirty();
+      flushPreviewUpdate();
+      setStatus(box,e.target.value==="hidden"?"Field marked hidden locally. Save to persist.":"Field mode changed locally. Save to persist.","");
+      return;
+    }
     if(!field)return;
     api.setLocal(field,e.target.value);
+    if(currentModeForField(field)==="default")api.setLocal(field+".__mode","custom");
+    markDirty();
     flushPreviewUpdate();
   });
 
@@ -295,4 +369,4 @@ function bind(api,root){
 }
 window.SyncEtc.Components.CustomerSettings={version:VERSION,render:render,bind:bind,installStyles:installStyles,canRender:canRender,registerPage:registerPage,getRegisteredPage:getRegisteredPage};
 })();
-/* COMPONENT-customer-settings-v1.js - END | Side drawer typing debounce fix */
+/* COMPONENT-customer-settings-v1.js - END | typing debounce + unsaved warning + field mode groundwork */
