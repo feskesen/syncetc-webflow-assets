@@ -1,4 +1,4 @@
-/* COMPONENT-master-controls-v1.js | view-as default display cleanup | Generated: 2026-05-31 06:53:53 UTC */
+/* COMPONENT-master-controls-v1.js | view-as button grid + no scroll jump support | Generated: 2026-05-31 07:10:45 UTC */
 /* COMPONENT-master-controls-v1.js - BEGIN */
 (function(){
 "use strict";
@@ -242,12 +242,27 @@ function bind(api,root){
     var view=t.closest("[data-se-view]");
     if(view){
       var v=view.getAttribute("data-se-view");
+      var drawer=view.closest(".syncetc-drawer");
+      var drawerBody=drawer?drawer.querySelector(".syncetc-drawer-body"):null;
+      var keepTop=drawer?drawer.scrollTop||0:0;
+      var keepBodyTop=drawerBody?drawerBody.scrollTop||0:0;
+      var keepX=window.scrollX||0, keepY=window.scrollY||0;
       editor.querySelectorAll("[data-se-view]").forEach(function(b){b.classList.toggle("is-active",b===view);b.classList.toggle("active",b===view);});
       api.setViewAs(v);
       setText("[data-se-view-label]",v);
-      
       try{document.dispatchEvent(new CustomEvent("syncetc:view-as-hard-change",{detail:{viewAs:v}}));}catch(err){}
       if(api.renderAdminLayerOnly)api.renderAdminLayerOnly();
+      setTimeout(function(){
+        try{
+          var freshDrawer=document.querySelector(".syncetc-drawer");
+          var freshBody=freshDrawer?freshDrawer.querySelector(".syncetc-drawer-body"):null;
+          if(freshDrawer)freshDrawer.scrollTop=keepTop;
+          if(freshBody)freshBody.scrollTop=keepBodyTop;
+          var freshBtn=freshDrawer?freshDrawer.querySelector('[data-se-view="'+CSS.escape(v)+'"]'):null;
+          if(freshBtn&&freshBtn.focus)freshBtn.focus({preventScroll:true});
+          window.scrollTo(keepX,keepY);
+        }catch(err){}
+      },0);
       return;
     }
 

@@ -1,4 +1,4 @@
-/* COMPONENT-site-shell-v1.js | preserve drawer scroll/focus on re-render | Generated: 2026-05-31 07:00:42 UTC */
+/* COMPONENT-site-shell-v1.js | drawer scroll stable v2 | Generated: 2026-05-31 07:10:45 UTC */
 /* COMPONENT-site-shell-v1.js - BEGIN */
 (function () {
   "use strict";
@@ -135,9 +135,12 @@
     }
 
     function render(pageHtml){
-      var priorDrawerScrollTop=0, priorDrawerBodyScrollTop=0, priorActiveSelector="", priorActiveValue="";
+      var priorDrawerScrollTop=0, priorDrawerBodyScrollTop=0, priorActiveSelector="", priorActiveValue="", priorWindowX=0, priorWindowY=0;
       try{
-        var oldDrawer=document.querySelector("#"+CSS.escape(mountId)+" .syncetc-drawer");
+        priorWindowX=window.scrollX||0;
+        priorWindowY=window.scrollY||0;
+        var oldShell=mount.querySelector("#syncetc-component-shell");
+        var oldDrawer=oldShell?oldShell.querySelector(".syncetc-drawer"):mount.querySelector(".syncetc-drawer");
         var oldDrawerBody=oldDrawer?oldDrawer.querySelector(".syncetc-drawer-body"):null;
         priorDrawerScrollTop=oldDrawer?oldDrawer.scrollTop||0:0;
         priorDrawerBodyScrollTop=oldDrawerBody?oldDrawerBody.scrollTop||0:0;
@@ -146,7 +149,7 @@
           if(active.id)priorActiveSelector="#"+CSS.escape(active.id);
           else if(active.getAttribute("data-se-view"))priorActiveSelector='[data-se-view="'+CSS.escape(active.getAttribute("data-se-view"))+'"]';
           else if(active.getAttribute("data-se-local"))priorActiveSelector='[data-se-local="'+CSS.escape(active.getAttribute("data-se-local"))+'"]';
-          else if(active.getAttribute("data-se-customer")!==null)priorActiveSelector="[data-se-customer]";
+          else if(active.hasAttribute&&active.hasAttribute("data-se-customer"))priorActiveSelector="[data-se-customer]";
           else if(active.getAttribute("data-cs-local"))priorActiveSelector='[data-cs-local="'+CSS.escape(active.getAttribute("data-cs-local"))+'"]';
           else if(active.getAttribute("data-cs-restore-one"))priorActiveSelector='[data-cs-restore-one="'+CSS.escape(active.getAttribute("data-cs-restore-one"))+'"]';
           priorActiveValue=active.value||"";
@@ -177,17 +180,24 @@
 
       try{
         if(state.drawerOpen){
-          var newDrawer=shell.querySelector(".syncetc-drawer");
-          var newDrawerBody=newDrawer?newDrawer.querySelector(".syncetc-drawer-body"):null;
-          if(newDrawer)newDrawer.scrollTop=priorDrawerScrollTop||0;
-          if(newDrawerBody)newDrawerBody.scrollTop=priorDrawerBodyScrollTop||0;
-          if(priorActiveSelector){
-            var nextActive=shell.querySelector(priorActiveSelector);
-            if(nextActive&&nextActive.focus){
-              nextActive.focus({preventScroll:true});
-              if(priorActiveValue&&"value" in nextActive&&nextActive.value!==priorActiveValue)nextActive.value=priorActiveValue;
+          var restoreDrawer=function(){
+            var newDrawer=shell.querySelector(".syncetc-drawer");
+            var newDrawerBody=newDrawer?newDrawer.querySelector(".syncetc-drawer-body"):null;
+            if(newDrawer)newDrawer.scrollTop=priorDrawerScrollTop||0;
+            if(newDrawerBody)newDrawerBody.scrollTop=priorDrawerBodyScrollTop||0;
+            if(priorActiveSelector){
+              var nextActive=shell.querySelector(priorActiveSelector);
+              if(nextActive&&nextActive.focus){
+                nextActive.focus({preventScroll:true});
+                if(priorActiveValue&&"value" in nextActive&&nextActive.value!==priorActiveValue)nextActive.value=priorActiveValue;
+              }
             }
-          }
+            window.scrollTo(priorWindowX||0,priorWindowY||0);
+          };
+          restoreDrawer();
+          requestAnimationFrame(restoreDrawer);
+          setTimeout(restoreDrawer,0);
+          setTimeout(restoreDrawer,50);
         }
       }catch(e){}
     }
