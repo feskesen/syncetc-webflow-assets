@@ -1,4 +1,4 @@
-/* COMPONENT-customer-settings-v1.js - BEGIN | typing debounce + unsaved warning + field mode groundwork */
+/* COMPONENT-customer-settings-v1.js - BEGIN | debounce + dirty guard + blank-means-hidden */
 (function(){
 "use strict";
 window.SyncEtc=window.SyncEtc||{};
@@ -9,6 +9,8 @@ var ACTION_URL="https://ocdaohkiwonjmirqkjww.supabase.co/functions/v1/syncetc-si
 var registry={};
 var hasUnsavedCustomerSettings=false;
 var beforeUnloadInstalled=false;
+var dirtyGuardInstalled=false;
+var lastCustomerSelectValue="";
 
 function ensureBeforeUnloadProtection(){
   if(beforeUnloadInstalled)return;
@@ -24,10 +26,90 @@ function ensureBeforeUnloadProtection(){
 function markDirty(){
   hasUnsavedCustomerSettings=true;
   ensureBeforeUnloadProtection();
+  ensureDirtyActionGuard();
 }
 
 function markClean(){
   hasUnsavedCustomerSettings=false;
+}
+
+function confirmDiscardUnsaved(reason){
+  if(!hasUnsavedCustomerSettings)return true;
+  var msg="You have unsaved customer setting changes. Continue and discard those changes?";
+  if(reason)msg+="\n\nAction: "+reason;
+  var ok=window.confirm(msg);
+  if(ok)markClean();
+  return ok;
+}
+
+function shouldGuardLink(a){
+  if(!a)return false;
+  var href=a.getAttribute("href")||"";
+  if(!href||href==="#"||href.indexOf("javascript:")===0)return false;
+  if(a.closest("[data-se-customer-settings]"))return false;
+  return true;
+}
+
+function ensureDirtyActionGuard(){
+  if(dirtyGuardInstalled)return;
+  dirtyGuardInstalled=true;
+
+  document.addEventListener("focusin",function(e){
+    var t=e.target;
+    if(t&&t.matches&&t.matches("[data-se-customer]")){
+      lastCustomerSelectValue=t.value;
+    }
+  },true);
+
+  document.addEventListener("mousedown",function(e){
+    var t=e.target;
+    if(t&&t.matches&&t.matches("[data-se-customer]")){
+      lastCustomerSelectValue=t.value;
+    }
+  },true);
+
+  document.addEventListener("click",function(e){
+    if(!hasUnsavedCustomerSettings)return;
+    var t=e.target;
+    if(!t||!t.closest)return;
+
+    if(t.closest("[data-se-drawer-close]")){
+      return; // Closing the drawer preserves staged edits on the current page.
+    }
+
+    if(t.closest("[data-se-drawer-signout]")||t.closest("[data-se-auth-logout]")||t.closest("[data-se-signout]")){
+      if(!confirmDiscardUnsaved("sign out")){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+      return;
+    }
+
+    var a=t.closest("a[href]");
+    if(shouldGuardLink(a)){
+      if(!confirmDiscardUnsaved("leave this page")){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }
+  },true);
+
+  document.addEventListener("change",function(e){
+    if(!hasUnsavedCustomerSettings)return;
+    var t=e.target;
+    if(!t||!t.matches)return;
+
+    if(t.matches("[data-se-customer]")){
+      var attempted=t.value;
+      if(!confirmDiscardUnsaved("switch customer")){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if(lastCustomerSelectValue!==undefined&&lastCustomerSelectValue!==null)t.value=lastCustomerSelectValue;
+      }else{
+        lastCustomerSelectValue=attempted;
+      }
+    }
+  },true);
 }
 
 
@@ -73,7 +155,8 @@ function installStyles(){
     .se-customer-settings-control input,.se-customer-settings-control textarea,.se-customer-settings-control select{width:100%;border:1px solid rgba(18,54,90,.20);border-radius:11px;padding:9px 10px;font:inherit;font-size:13px;background:#fff;color:#102034;box-sizing:border-box}
     .se-customer-settings-control textarea{min-height:78px;resize:vertical}
     .se-customer-settings-control small{display:block;margin-top:4px;color:#64748b;font-size:11px;line-height:1.35}
-    .se-customer-settings-mode{margin-top:4px;padding-top:8px;border-top:1px dashed rgba(18,54,90,.16)}
+    .se-customer-settings-control.is-deleted input,.se-customer-settings-control.is-deleted textarea{background:#fffaf0;border-style:dashed}
+    .se-cs-default-link{display:inline;border:0;background:transparent;color:#12365a!important;text-decoration:underline;text-underline-offset:2px;font:inherit;font-weight:900;cursor:pointer;padding:0}
     .se-customer-settings-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
     .se-customer-settings-actions button,.se-manager-link{border:1px solid rgba(18,54,90,.20);border-radius:999px;padding:9px 11px;background:#12365a;color:#fff!important;font-weight:900;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
     .se-customer-settings-actions button.secondary,.se-manager-link.secondary{background:#fff;color:#12365a!important}
@@ -104,16 +187,17 @@ function defaultsForSchema(schema,ctx,api){
   (schema.fields||[]).forEach(function(f){out[f.key]=fieldDefault(f,{});});
   return out;
 }
-function renderField(field,value,def,mode){
+function renderField(field,value,def){
   var tag=field.type==="textarea"?"textarea":"input";
-  mode=mode||"default";
-  var help=field.help?'<small>'+esc(field.help)+'</small>':('<small>Default: '+esc(def)+'</small>');
-  var modeHelp='<small>Mode: Default uses SyncEtc text. Custom uses this field. Hidden is saved for pages that support hiding this item.</small>';
-  var modeSelect='<label class="se-customer-settings-control se-customer-settings-mode"><span>'+esc(field.label||field.key)+' Mode</span><select data-cs-mode-for="'+esc(field.key)+'"><option value="default" '+(mode==="default"?"selected":"")+'>Use default</option><option value="custom" '+(mode==="custom"?"selected":"")+'>Custom text</option><option value="hidden" '+(mode==="hidden"?"selected":"")+'>Hide this field</option></select>'+modeHelp+'</label>';
+  var isBlank=clean(value)==="";
+  var help='<small>Default: <button type="button" class="se-cs-default-link" data-cs-restore-one="'+esc(field.key)+'">'+esc(def||"blank")+'</button></small>';
+  if(field.help)help+='<small>'+esc(field.help)+'</small>';
+  help+='<small>'+(isBlank?'This field is marked hidden/deleted. Type custom text to restore it.':'Delete all text to hide this field on pages that support hiding.')+'</small>';
+  var placeholder=isBlank?' placeholder="Deleted — type here to restore custom text"':'';
   if(tag==="textarea"){
-    return modeSelect+'<label class="se-customer-settings-control"><span>'+esc(field.label||field.key)+'</span><textarea data-cs-local="'+esc(field.key)+'">'+esc(value)+'</textarea>'+help+'</label>';
+    return '<label class="se-customer-settings-control '+(isBlank?'is-deleted':'')+'"><span>'+esc(field.label||field.key)+'</span><textarea data-cs-local="'+esc(field.key)+'"'+placeholder+'>'+esc(value)+'</textarea>'+help+'</label>';
   }
-  return modeSelect+'<label class="se-customer-settings-control"><span>'+esc(field.label||field.key)+'</span><input data-cs-local="'+esc(field.key)+'" value="'+esc(value)+'">'+help+'</label>';
+  return '<label class="se-customer-settings-control '+(isBlank?'is-deleted':'')+'"><span>'+esc(field.label||field.key)+'</span><input data-cs-local="'+esc(field.key)+'" value="'+esc(value)+'"'+placeholder+'>'+help+'</label>';
 }
 function render(ctx){
   installStyles();
@@ -130,9 +214,7 @@ function render(ctx){
       currentSection=section;
       if(section)prefix='<div class="se-customer-settings-section">'+esc(section)+'</div>';
     }
-    var modeKey=field.key+".__mode";
-    var mode=(local&&local[modeKey])?local[modeKey]:(local&&Object.prototype.hasOwnProperty.call(local,field.key)?"custom":"default");
-    return prefix+renderField(field,fieldValue(field,local,defaults),fieldDefault(field,defaults),mode);
+    return prefix+renderField(field,fieldValue(field,local,defaults),fieldDefault(field,defaults));
   }).join("");
   var manager="";
   if(schema.managerLink&&schema.managerLink.label){
@@ -199,8 +281,7 @@ function buildPayload(api,schema){
   var pageKey=schema.pageKey||api.getState().pageKey||"page";
   var modes={};
   (schema.fields||[]).forEach(function(f){
-    var modeKey=f.key+".__mode";
-    modes[f.key]=(local&&local[modeKey])?local[modeKey]:(local&&Object.prototype.hasOwnProperty.call(local,f.key)?"custom":"default");
+    modes[f.key]=clean(values[f.key])===""?"hidden":"custom";
   });
   var contentOverrides=Object.assign({},content);
   contentOverrides[pageKey]=Object.assign({},contentOverrides[pageKey]||{},values,{__field_modes:modes});
@@ -242,6 +323,8 @@ function bind(api,root){
   if(!box||box.getAttribute("data-cs-bound")==="1")return;
   box.setAttribute("data-cs-bound","1");
   ensureBeforeUnloadProtection();
+  ensureDirtyActionGuard();
+
   var schema=schemaFor({pageKey:api.getState().pageKey,customerKey:api.getState().customerKey,customer:api.customer(),local:api.getState().local});
   var restoreBackup=null;
   var typingTimer=null;
@@ -262,13 +345,40 @@ function bind(api,root){
     dispatchLocalChange(schema,api);
   }
 
-  function currentModeForField(field){
+  function captureBackup(){
     var local=api.getState().local||{};
-    var modeKey=field+".__mode";
-    return local[modeKey]||"custom";
+    restoreBackup={};
+    (schema.fields||[]).forEach(function(f){restoreBackup[f.key]=local[f.key];});
+    var undo=box.querySelector("[data-cs-undo]");
+    if(undo)undo.disabled=false;
+  }
+
+  function refreshControlClass(fieldKey,value){
+    var el=box.querySelector('[data-cs-local="'+CSS.escape(fieldKey)+'"]');
+    if(!el)return;
+    var wrap=el.closest(".se-customer-settings-control");
+    if(wrap)wrap.classList.toggle("is-deleted",clean(value)==="");
   }
 
   box.addEventListener("click",function(e){
+    var restoreOne=e.target.closest("[data-cs-restore-one]");
+    if(restoreOne){
+      var key=restoreOne.getAttribute("data-cs-restore-one");
+      var field=(schema.fields||[]).filter(function(f){return f.key===key;})[0];
+      if(!field)return;
+      captureBackup();
+      var defaults=defaultsForSchema(schema,{customer:api.customer(),customerKey:api.getState().customerKey,pageKey:schema.pageKey,local:api.getState().local||{}},api);
+      var v=fieldDefault(field,defaults);
+      if(defaults&&Object.prototype.hasOwnProperty.call(defaults,field.key))v=defaults[field.key];
+      api.setLocal(field.key,v);
+      setInput(box,field.key,v);
+      refreshControlClass(field.key,v);
+      markDirty();
+      flushPreviewUpdate();
+      setStatus(box,"Default restored for this field. Save to persist.","");
+      return;
+    }
+
     if(e.target.closest("[data-cs-save]")){
       if(typingTimer){
         clearTimeout(typingTimer);
@@ -277,39 +387,32 @@ function bind(api,root){
       save(api,box,schema);
       return;
     }
+
     if(e.target.closest("[data-cs-restore]")){
+      if(hasUnsavedCustomerSettings&&!window.confirm("Restore all defaults for this page? Unsaved custom edits will be replaced locally."))return;
+      captureBackup();
       var local=api.getState().local||{};
-      restoreBackup={};
-      (schema.fields||[]).forEach(function(f){
-        restoreBackup[f.key]=local[f.key];
-        restoreBackup[f.key+".__mode"]=local[f.key+".__mode"];
-      });
       var defaults=defaultsForSchema(schema,{customer:api.customer(),customerKey:api.getState().customerKey,pageKey:schema.pageKey,local:local},api);
       (schema.fields||[]).forEach(function(f){
         var v=fieldDefault(f,defaults);
         if(defaults&&Object.prototype.hasOwnProperty.call(defaults,f.key))v=defaults[f.key];
         api.setLocal(f.key,v);
-        api.setLocal(f.key+".__mode","default");
         setInput(box,f.key,v);
-        var modeEl=box.querySelector('[data-cs-mode-for="'+CSS.escape(f.key)+'"]');
-        if(modeEl)modeEl.value="default";
+        refreshControlClass(f.key,v);
       });
-      var undo=box.querySelector("[data-cs-undo]");if(undo)undo.disabled=false;
       markDirty();
       flushPreviewUpdate();
       setStatus(box,"Defaults restored locally. Save to persist.","");
       return;
     }
+
     if(e.target.closest("[data-cs-undo]")){
       if(!restoreBackup)return;
       (schema.fields||[]).forEach(function(f){
         var v=restoreBackup[f.key]||"";
-        var mode=restoreBackup[f.key+".__mode"]||"custom";
         api.setLocal(f.key,v);
-        api.setLocal(f.key+".__mode",mode);
         setInput(box,f.key,v);
-        var modeEl=box.querySelector('[data-cs-mode-for="'+CSS.escape(f.key)+'"]');
-        if(modeEl)modeEl.value=mode;
+        refreshControlClass(f.key,v);
       });
       e.target.disabled=true;
       markDirty();
@@ -317,13 +420,14 @@ function bind(api,root){
       setStatus(box,"Restore undone locally. Save to persist.","");
       return;
     }
+
     if(e.target.closest("[data-cs-clear]")){
+      if(!window.confirm("Clear all editable copy fields for this page? Blank fields are treated as hidden/deleted on pages that support hiding."))return;
+      captureBackup();
       (schema.fields||[]).forEach(function(f){
         api.setLocal(f.key,"");
-        api.setLocal(f.key+".__mode","custom");
         setInput(box,f.key,"");
-        var modeEl=box.querySelector('[data-cs-mode-for="'+CSS.escape(f.key)+'"]');
-        if(modeEl)modeEl.value="custom";
+        refreshControlClass(f.key,"");
       });
       markDirty();
       flushPreviewUpdate();
@@ -336,26 +440,16 @@ function bind(api,root){
     var field=e.target&&e.target.getAttribute&&e.target.getAttribute("data-cs-local");
     if(!field)return;
     api.setLocal(field,e.target.value);
-    if(currentModeForField(field)==="default")api.setLocal(field+".__mode","custom");
-    var modeEl=box.querySelector('[data-cs-mode-for="'+CSS.escape(field)+'"]');
-    if(modeEl&&modeEl.value==="default")modeEl.value="custom";
+    refreshControlClass(field,e.target.value);
     markDirty();
     schedulePreviewUpdate();
   });
 
   box.addEventListener("change",function(e){
     var field=e.target&&e.target.getAttribute&&e.target.getAttribute("data-cs-local");
-    var modeFor=e.target&&e.target.getAttribute&&e.target.getAttribute("data-cs-mode-for");
-    if(modeFor){
-      api.setLocal(modeFor+".__mode",e.target.value);
-      markDirty();
-      flushPreviewUpdate();
-      setStatus(box,e.target.value==="hidden"?"Field marked hidden locally. Save to persist.":"Field mode changed locally. Save to persist.","");
-      return;
-    }
     if(!field)return;
     api.setLocal(field,e.target.value);
-    if(currentModeForField(field)==="default")api.setLocal(field+".__mode","custom");
+    refreshControlClass(field,e.target.value);
     markDirty();
     flushPreviewUpdate();
   });
@@ -364,9 +458,10 @@ function bind(api,root){
     var field=e.target&&e.target.getAttribute&&e.target.getAttribute("data-cs-local");
     if(!field)return;
     api.setLocal(field,e.target.value);
+    refreshControlClass(field,e.target.value);
     flushPreviewUpdate();
   },true);
 }
 window.SyncEtc.Components.CustomerSettings={version:VERSION,render:render,bind:bind,installStyles:installStyles,canRender:canRender,registerPage:registerPage,getRegisteredPage:getRegisteredPage};
 })();
-/* COMPONENT-customer-settings-v1.js - END | typing debounce + unsaved warning + field mode groundwork */
+/* COMPONENT-customer-settings-v1.js - END | debounce + dirty guard + blank-means-hidden */
