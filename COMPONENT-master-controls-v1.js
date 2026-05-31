@@ -1,3 +1,4 @@
+/* COMPONENT-master-controls-v1.js | Site Editor guardrails + view-as sync | Generated: 2026-05-31 06:30:03 UTC */
 /* COMPONENT-master-controls-v1.js - BEGIN */
 (function(){
 "use strict";
@@ -5,6 +6,114 @@ window.SyncEtc=window.SyncEtc||{};
 window.SyncEtc.Components=window.SyncEtc.Components||{};
 var VERSION="COMPONENT-master-controls-v1";
 var ACTION_URL="https://ocdaohkiwonjmirqkjww.supabase.co/functions/v1/syncetc-site-settings-action";
+var siteEditorDirty=false;
+var beforeUnloadInstalled=false;
+var dirtyGuardInstalled=false;
+var lastCustomerSelectValue="";
+
+function ensureBeforeUnloadProtection(){
+  if(beforeUnloadInstalled)return;
+  beforeUnloadInstalled=true;
+  window.addEventListener("beforeunload",function(e){
+    if(!siteEditorDirty)return;
+    e.preventDefault();
+    e.returnValue="";
+    return "";
+  });
+}
+
+function markDirty(root,msg){
+  siteEditorDirty=true;
+  ensureBeforeUnloadProtection();
+  ensureDirtyGuard();
+  if(root)markStatus(root,msg||"Unsaved site setting changes.","warn");
+}
+
+function markClean(root,msg){
+  siteEditorDirty=false;
+  if(root)markStatus(root,msg||"Saved customer site settings.","good");
+}
+
+function confirmDiscardUnsaved(reason){
+  if(!siteEditorDirty)return true;
+  var msg="You have unsaved Site Editor changes. Continue and discard those changes?";
+  if(reason)msg+="\n\nAction: "+reason;
+  var ok=window.confirm(msg);
+  if(ok)siteEditorDirty=false;
+  return ok;
+}
+
+function shouldGuardLink(a){
+  if(!a)return false;
+  var href=a.getAttribute("href")||"";
+  if(!href||href==="#"||href.indexOf("javascript:")===0)return false;
+  if(a.closest("[data-se-editor]"))return false;
+  return true;
+}
+
+function ensureDirtyGuard(){
+  if(dirtyGuardInstalled)return;
+  dirtyGuardInstalled=true;
+
+  document.addEventListener("focusin",function(e){
+    var t=e.target;
+    if(t&&t.matches&&t.matches("[data-se-customer]"))lastCustomerSelectValue=t.value;
+  },true);
+
+  document.addEventListener("mousedown",function(e){
+    var t=e.target;
+    if(t&&t.matches&&t.matches("[data-se-customer]"))lastCustomerSelectValue=t.value;
+  },true);
+
+  document.addEventListener("click",function(e){
+    if(!siteEditorDirty)return;
+    var t=e.target;
+    if(!t||!t.closest)return;
+
+    if(t.closest("[data-se-drawer-close]"))return; // closing drawer preserves staged local changes
+
+    if(t.closest("[data-se-drawer-signout]")||t.closest("[data-se-auth-logout]")||t.closest("[data-se-signout]")){
+      if(!confirmDiscardUnsaved("sign out")){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+      return;
+    }
+
+    var a=t.closest("a[href]");
+    if(shouldGuardLink(a)){
+      if(!confirmDiscardUnsaved("leave this page")){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }
+  },true);
+
+  document.addEventListener("change",function(e){
+    if(!siteEditorDirty)return;
+    var t=e.target;
+    if(!t||!t.matches)return;
+
+    if(t.matches("[data-se-customer]")){
+      var attempted=t.value;
+      if(!confirmDiscardUnsaved("switch customer")){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if(lastCustomerSelectValue!==undefined&&lastCustomerSelectValue!==null)t.value=lastCustomerSelectValue;
+      }else{
+        lastCustomerSelectValue=attempted;
+      }
+    }
+  },true);
+}
+
+function markStatus(root,msg,cls){
+  var status=root&&root.querySelector?root.querySelector("[data-se-status]"):null;
+  if(!status)return;
+  status.textContent=msg||"";
+  status.className="se-status"+(cls?" "+cls:"");
+}
+
 function U(){return window.SyncEtc.Components.Utils;}
 function clean(v){return v==null?"":String(v).trim();}
 function findAccessToken(obj,depth){
@@ -71,7 +180,9 @@ function installStyles(){U().installStyle("COMPONENT-master-controls-v17-style",
     .syncetc-drawer .se-view-row button:hover,
     .syncetc-drawer button[data-se-view]:hover{border-color:#12365a!important}
     .syncetc-drawer .se-view-row button.is-active,
-    .syncetc-drawer button[data-se-view].is-active{background:#12365a!important;color:#fff!important;border-color:#12365a!important}
+    .syncetc-drawer .se-view-row button.active,
+    .syncetc-drawer button[data-se-view].is-active,
+    .syncetc-drawer button[data-se-view].active{background:#12365a!important;color:#fff!important;border-color:#12365a!important}
     .syncetc-drawer .se-actions{display:flex!important;flex-wrap:wrap!important;gap:8px!important;margin:12px 0 16px!important;background:transparent!important}
     .syncetc-drawer .se-actions button,
     .syncetc-drawer .se-save,
@@ -87,16 +198,18 @@ function installStyles(){U().installStyle("COMPONENT-master-controls-v17-style",
     .syncetc-drawer .se-preview-pills{display:flex!important;gap:6px!important;flex-wrap:wrap!important;margin-top:9px!important}
     .syncetc-drawer .se-preview-pills span{font-size:10.5px!important;font-weight:950!important;color:#12365a!important}
     .syncetc-drawer .se-preview-pills span+span:before{content:'·';margin-right:6px;color:#8da0b5}
+    .syncetc-drawer .se-actions{position:sticky!important;bottom:0!important;background:#f8fbff!important;padding:10px 0 8px!important;border-top:1px solid rgba(18,54,90,.10)!important}
     .syncetc-drawer .se-status{margin-top:10px!important;color:#304d73!important;font-size:12px!important;font-weight:900!important;min-height:18px!important}
     .syncetc-drawer .se-status.warn{color:#8f2424!important}
     .syncetc-drawer .se-status.good{color:#247245!important}
   `);}
 function snapshot(){return window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.getSnapshot?window.SyncEtc.SecurityContext.getSnapshot():{};}
 function isPlatformAdmin(){return !!(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isPlatformAdmin&&window.SyncEtc.SecurityContext.isPlatformAdmin());}
-function render(ctx){installStyles();if(!isPlatformAdmin())return"";var c=ctx.customer||{}, local=ctx.local||{}, content=c.content||{}, title=local.calendarTitle||nested(content,"calendar.title","Calendar"), intro=local.calendarIntro||nested(content,"calendar.intro","Upcoming meetings, fly-outs, work sessions, and other events."), preset=local.stylePresetKey||c.stylePresetKey||"classic-aviation", layoutPreset=local.layoutPresetKey||nested(c,"layout.preset","standard-layout"), presets=c.availablePresets||window.SyncEtc.Components.CustomerStyle.fallbackPresets||[], customerKey=ctx.customerKey||c.customer_key||"demo_flying_club", viewAs=ctx.viewAs||"public", open=ctx.siteEditorOpen===true, sec=snapshot(), actor=sec.actor_email||"signed-in user", platformRole=sec.platform_role||"platform admin", activeCustomerRole=sec.active_customer_role||"n/a";function selected(a,b){return clean(a)===clean(b)?"selected":"";}function active(v){return clean(v)===clean(viewAs)?"active":"";}return `<section class="se-workbench"><div class="se-editor ${open?"is-open":""}" data-se-editor><div class="se-editor-top"><div class="se-editor-title"><h2>SyncEtc Site Editor</h2><span class="se-pill">Calendar · View as <span data-se-view-label>${U().esc(viewAs)}</span></span></div><div class="se-top-actions"><div class="se-top-identity"><span>${U().esc(actor)}</span><span>${U().esc(platformRole)}</span></div><button class="se-top-signout" type="button" data-se-signout>Not you? Sign out</button><button class="se-toggle" type="button" data-se-toggle>${open?"Close Site Editor":"Open Site Editor"}</button></div></div><div class="se-editor-body"><div class="se-grid"><div class="se-panel"><h3>Platform Site Controls</h3><p class="se-help">Platform-only customer-wide style and layout controls. Customer-owned copy lives in Customer Settings below.</p><div class="se-row"><label class="se-control"><span>Customer</span><select data-se-customer><option value="demo_flying_club" ${selected("demo_flying_club",customerKey)}>Demo Flying Club</option><option value="150th_aero" ${selected("150th_aero",customerKey)}>150th Aero Flying Club</option></select><small>Reloads customer preview once selected.</small></label><label class="se-control"><span>Customer-wide Style Preset</span><select data-se-local="stylePresetKey">${presets.map(function(p){return '<option value="'+U().esc(p.preset_key)+'" '+selected(p.preset_key,preset)+'>'+U().esc(p.preset_name||p.preset_key)+'</option>';}).join("")}</select><small>Applies immediately to this page.</small></label></div><div class="se-row"><label class="se-control"><span>Customer-wide Layout Preset</span><select data-se-local="layoutPresetKey"><option value="standard-layout" ${selected("standard-layout",layoutPreset)}>Standard Layout</option><option value="compact-ops" ${selected("compact-ops",layoutPreset)}>Compact Ops</option><option value="bold-homepage" ${selected("bold-homepage",layoutPreset)}>Bold Homepage</option><option value="club-magazine" ${selected("club-magazine",layoutPreset)}>Club Magazine</option></select><small>Future site-wide layout preset. Not page-specific.</small></label><label class="se-control"><span>Preset Builder</span><input value="Deferred: future platform preset builder" disabled><small>Separate page later. Not part of day-to-day customer settings.</small></label></div><div class="se-viewas"><button type="button" class="se-view ${active("public")}" data-se-view="public">View as Public</button><button type="button" class="se-view ${active("member")}" data-se-view="member">View as Member</button><button type="button" class="se-view ${active("admin")}" data-se-view="admin">View as Customer Admin</button><button type="button" class="se-view ${active("platform")}" data-se-view="platform">View as SyncEtc Admin</button></div><div class="se-actions"><button type="button" data-se-save>Save Customer Site Settings</button><button type="button" class="secondary" data-se-reset>Reset local changes</button></div><div class="se-status" data-se-status></div></div><div class="se-panel"><h3>Customer Experience Preview</h3><p class="se-help">Confirms live style and copy without destroying the form.</p><div class="se-card"><div class="se-card-hero"><h4>Customer-wide Site Design</h4><p>Style and layout presets apply across compliant customer pages.</p></div><div class="se-card-body"><div class="se-preview-pills"><span data-se-preview-preset>${U().esc(c.preset||preset)}</span><span data-se-preview-layout>${U().esc(layoutPreset)}</span><span>Calendar</span><span>View as <span data-se-preview-view>${U().esc(viewAs)}</span></span></div></div></div></div></div></div></div></section>`;}
+function render(ctx){installStyles();if(!isPlatformAdmin())return"";var c=ctx.customer||{}, local=ctx.local||{}, content=c.content||{}, title=local.calendarTitle||nested(content,"calendar.title","Calendar"), intro=local.calendarIntro||nested(content,"calendar.intro","Upcoming meetings, fly-outs, work sessions, and other events."), preset=local.stylePresetKey||c.stylePresetKey||"classic-aviation", layoutPreset=local.layoutPresetKey||nested(c,"layout.preset","standard-layout"), presets=c.availablePresets||window.SyncEtc.Components.CustomerStyle.fallbackPresets||[], customerKey=ctx.customerKey||c.customer_key||"demo_flying_club", viewAs=ctx.viewAs||"public", open=ctx.siteEditorOpen===true, sec=snapshot(), actor=sec.actor_email||"signed-in user", platformRole=sec.platform_role||"platform admin", activeCustomerRole=sec.active_customer_role||"n/a";function selected(a,b){return clean(a)===clean(b)?"selected":"";}function active(v){return clean(v)===clean(viewAs)?"is-active":"";}return `<section class="se-workbench"><div class="se-editor ${open?"is-open":""}" data-se-editor><div class="se-editor-top"><div class="se-editor-title"><h2>SyncEtc Site Editor</h2><span class="se-pill">Calendar · View as <span data-se-view-label>${U().esc(viewAs)}</span></span></div><div class="se-top-actions"><div class="se-top-identity"><span>${U().esc(actor)}</span><span>${U().esc(platformRole)}</span></div><button class="se-top-signout" type="button" data-se-signout>Not you? Sign out</button><button class="se-toggle" type="button" data-se-toggle>${open?"Close Site Editor":"Open Site Editor"}</button></div></div><div class="se-editor-body"><div class="se-grid"><div class="se-panel"><h3>Platform Site Controls</h3><p class="se-help">Platform-only customer-wide style and layout controls. Changes here affect this customer site and must be saved before navigating away.</p><div class="se-row"><label class="se-control"><span>Customer</span><select data-se-customer><option value="demo_flying_club" ${selected("demo_flying_club",customerKey)}>Demo Flying Club</option><option value="150th_aero" ${selected("150th_aero",customerKey)}>150th Aero Flying Club</option></select><small>Switches customer preview. Unsaved changes are protected.</small></label><label class="se-control"><span>Customer-wide Style Preset</span><select data-se-local="stylePresetKey">${presets.map(function(p){return '<option value="'+U().esc(p.preset_key)+'" '+selected(p.preset_key,preset)+'>'+U().esc(p.preset_name||p.preset_key)+'</option>';}).join("")}</select><small>Applies locally for preview. Use Save Site Settings to persist.</small></label></div><div class="se-row"><label class="se-control"><span>Customer-wide Layout Preset</span><select data-se-local="layoutPresetKey"><option value="standard-layout" ${selected("standard-layout",layoutPreset)}>Standard Layout</option><option value="compact-ops" ${selected("compact-ops",layoutPreset)}>Compact Ops</option><option value="bold-homepage" ${selected("bold-homepage",layoutPreset)}>Bold Homepage</option><option value="club-magazine" ${selected("club-magazine",layoutPreset)}>Club Magazine</option></select><small>Future site-wide layout preset. Not page-specific.</small></label><label class="se-control"><span>Preset Builder</span><input value="Deferred: future platform preset builder" disabled><small>Separate page later. Not part of day-to-day customer settings.</small></label></div><div class="se-viewas"><button type="button" class="se-view ${active("public")}" data-se-view="public">View as Public</button><button type="button" class="se-view ${active("member")}" data-se-view="member">View as Member</button><button type="button" class="se-view ${active("admin")}" data-se-view="admin">View as Customer Admin</button><button type="button" class="se-view ${active("platform")}" data-se-view="platform">View as Platform Admin</button></div><div class="se-actions"><button type="button" data-se-save>Save Site Settings</button><button type="button" class="secondary" data-se-reset>Reset local changes</button></div><div class="se-status" data-se-status></div></div><div class="se-panel"><h3>Customer Experience Preview</h3><p class="se-help">Confirms live style and copy without destroying the form.</p><div class="se-card"><div class="se-card-hero"><h4>Customer-wide Site Design</h4><p>Style and layout presets apply across compliant customer pages.</p></div><div class="se-card-body"><div class="se-preview-pills"><span data-se-preview-preset>${U().esc(c.preset||preset)}</span><span data-se-preview-layout>${U().esc(layoutPreset)}</span><span>Calendar</span><span>View as <span data-se-preview-view>${U().esc(viewAs)}</span></span></div></div></div></div></div></div></div></section>`;}
 function setText(sel,val){document.querySelectorAll(sel).forEach(function(el){el.textContent=val;});}
-function save(api,root){var token=getToken();var status=root.querySelector("[data-se-status]");if(!token){status.textContent="Save failed: sign in required.";status.className="se-status warn";return;}status.textContent="Saving...";status.className="se-status";fetch(ACTION_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({action:"save_customer_site_settings",payload:api.getSavePayload()})}).then(function(r){return r.json().catch(function(){return null;}).then(function(body){if(!r.ok||!body||body.ok===false)throw new Error((body&&body.error)||"Save failed");return body;});}).then(function(){status.textContent="Saved customer site settings.";status.className="se-status good";}).catch(function(err){status.textContent="Save failed: "+(err.message||err);status.className="se-status warn";});}
+function save(api,root){var token=getToken();var status=root.querySelector("[data-se-status]");if(!token){markStatus(root,"Save failed: sign in required.","warn");return;}markStatus(root,"Saving...","");fetch(ACTION_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({action:"save_customer_site_settings",payload:api.getSavePayload()})}).then(function(r){return r.json().catch(function(){return null;}).then(function(body){if(!r.ok||!body||body.ok===false)throw new Error((body&&body.error)||"Save failed");return body;});}).then(function(){markClean(root,"Saved site settings.");}).catch(function(err){markStatus(root,"Save failed: "+(err.message||err),"warn");});}
 function signOutAndReload(){
+  if(!confirmDiscardUnsaved("sign out"))return;
   if(window.SyncEtc&&window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.signOutHard){
     window.SyncEtc.SecurityContext.signOutHard();
     return;
@@ -108,9 +221,95 @@ function signOutAndReload(){
   }catch(e){}
   setTimeout(function(){window.location.reload();},220);
 }
-function bind(api,root){var editor=root.querySelector("[data-se-editor]");if(!editor||editor.getAttribute("data-se-bound")==="1")return;editor.setAttribute("data-se-bound","1");editor.addEventListener("click",function(e){var t=e.target;if(t.closest("[data-se-toggle]")){var open=!editor.classList.contains("is-open");editor.classList.toggle("is-open",open);api.setEditorOpen(open);t.textContent=open?"Close Site Editor":"Open Site Editor";return;}var view=t.closest("[data-se-view]");if(view){var v=view.getAttribute("data-se-view");editor.querySelectorAll("[data-se-view]").forEach(function(b){b.classList.toggle("active",b===view);});api.setViewAs(v);setText("[data-se-view-label]",v);setText("[data-se-preview-view]",v);try{document.dispatchEvent(new CustomEvent("syncetc:view-as-hard-change",{detail:{viewAs:v}}));}catch(err){}return;}if(t.closest("[data-se-signout]")){signOutAndReload();return;}if(t.closest("[data-se-save]")){save(api,editor);return;}if(t.closest("[data-se-reset]")){window.location.reload();return;}});editor.addEventListener("change",function(e){var t=e.target;if(t.matches("[data-se-customer]")){api.setCustomerKey(t.value);api.loadCustomer().then(function(){window.SyncEtc.Components.Utils.dispatch("syncetc:customer-hard-change",{customerKey:t.value});});return;}if(t.matches("[data-se-local]"))handleLocal(api,editor,t);});editor.addEventListener("input",function(e){var t=e.target;if(t.matches("[data-se-local]"))handleLocal(api,editor,t);});}
-function handleLocal(api,editor,t){var field=t.getAttribute("data-se-local"),value=t.value;api.setLocal(field,value);if(field==="stylePresetKey"){var c=api.customer();var theme=window.SyncEtc.Components.CustomerStyle.themeForPreset(c,value);window.SyncEtc.Components.CustomerStyle.applyThemeVars(document.getElementById("syncetc-component-shell"),theme);var label=t.options[t.selectedIndex]?t.options[t.selectedIndex].textContent:value;setText("[data-se-preview-preset]",label);}
-if(field==="layoutPresetKey"){var layoutLabel=t.options[t.selectedIndex]?t.options[t.selectedIndex].textContent:value;setText("[data-se-preview-layout]",layoutLabel);}
+function bind(api,root){
+  var editor=root.querySelector("[data-se-editor]");
+  if(!editor||editor.getAttribute("data-se-bound")==="1")return;
+  editor.setAttribute("data-se-bound","1");
+  ensureBeforeUnloadProtection();
+  ensureDirtyGuard();
+
+  editor.addEventListener("click",function(e){
+    var t=e.target;
+    if(t.closest("[data-se-toggle]")){
+      var open=!editor.classList.contains("is-open");
+      editor.classList.toggle("is-open",open);
+      api.setEditorOpen(open);
+      t.textContent=open?"Close Site Editor":"Open Site Editor";
+      return;
+    }
+
+    var view=t.closest("[data-se-view]");
+    if(view){
+      var v=view.getAttribute("data-se-view");
+      editor.querySelectorAll("[data-se-view]").forEach(function(b){b.classList.toggle("is-active",b===view);b.classList.toggle("active",b===view);});
+      api.setViewAs(v);
+      setText("[data-se-view-label]",v);
+      setText("[data-se-preview-view]",v);
+      try{document.dispatchEvent(new CustomEvent("syncetc:view-as-hard-change",{detail:{viewAs:v}}));}catch(err){}
+      if(api.renderAdminLayerOnly)api.renderAdminLayerOnly();
+      return;
+    }
+
+    if(t.closest("[data-se-signout]")){signOutAndReload();return;}
+    if(t.closest("[data-se-save]")){save(api,editor);return;}
+
+    if(t.closest("[data-se-reset]")){
+      if(siteEditorDirty&&!window.confirm("Reset local Site Editor changes?"))return;
+      siteEditorDirty=false;
+      window.location.reload();
+      return;
+    }
+  });
+
+  editor.addEventListener("change",function(e){
+    var t=e.target;
+
+    if(t.matches("[data-se-customer]")){
+      if(siteEditorDirty&&!confirmDiscardUnsaved("switch customer")){
+        if(lastCustomerSelectValue)t.value=lastCustomerSelectValue;
+        return;
+      }
+      lastCustomerSelectValue=t.value;
+      api.setCustomerKey(t.value);
+      api.loadCustomer().then(function(){
+        window.SyncEtc.Components.Utils.dispatch("syncetc:customer-hard-change",{customerKey:t.value});
+        markStatus(editor,"Customer preview loaded.","");
+      });
+      return;
+    }
+
+    if(t.matches("[data-se-local]")){
+      handleLocal(api,editor,t);
+      markDirty(editor,"Unsaved site setting changes. Save before navigating away.");
+    }
+  });
+
+  editor.addEventListener("input",function(e){
+    var t=e.target;
+    if(t.matches("[data-se-local]")){
+      handleLocal(api,editor,t);
+      markDirty(editor,"Unsaved site setting changes. Save before navigating away.");
+    }
+  });
+}
+function handleLocal(api,editor,t){
+  var field=t.getAttribute("data-se-local"),value=t.value;
+  api.setLocal(field,value);
+
+  if(field==="stylePresetKey"){
+    var c=api.customer();
+    var theme=window.SyncEtc.Components.CustomerStyle.themeForPreset(c,value);
+    window.SyncEtc.Components.CustomerStyle.applyThemeVars(document.getElementById("syncetc-component-shell"),theme);
+    var label=t.options[t.selectedIndex]?t.options[t.selectedIndex].textContent:value;
+    setText("[data-se-preview-preset]",label);
+    markStatus(editor,"Unsaved style preset change. Click Save Site Settings to persist.","warn");
+  }
+
+  if(field==="layoutPresetKey"){
+    var layoutLabel=t.options[t.selectedIndex]?t.options[t.selectedIndex].textContent:value;
+    setText("[data-se-preview-layout]",layoutLabel);
+    markStatus(editor,"Unsaved layout preset change. Click Save Site Settings to persist.","warn");
+  }
 }
 window.SyncEtc.Components.MasterControls={version:VERSION,render:render,bind:bind,installStyles:installStyles};
 })();
