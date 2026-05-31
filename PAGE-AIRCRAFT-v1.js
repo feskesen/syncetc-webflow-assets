@@ -1,4 +1,4 @@
-/* PAGE-AIRCRAFT-v1.js - BEGIN | hidden blank fields honored */
+/* PAGE-AIRCRAFT-v1.js | customer-owned Supabase page settings | Generated: 2026-05-31 16:09:55 UTC */
 (function () {
   "use strict";
 
@@ -215,10 +215,39 @@
     document.head.appendChild(style);
   }
 
+  function customerAircraftSettings(customerKey){
+    try{
+      var cs=window.SyncEtc&&window.SyncEtc.Components&&window.SyncEtc.Components.CustomerStyle;
+      if(!cs||!cs.getCustomerConfig)return null;
+      var customer=cs.getCustomerConfig(customerKey);
+      var row=cs.pageSettingsFor?cs.pageSettingsFor(customer,"aircraft"):((customer.customerPageSettingsByKey||{}).aircraft);
+      return row&&row.settings_json?row.settings_json:null;
+    }catch(e){return null;}
+  }
+
+  function applyAircraftSettings(cfg,settings){
+    settings=settings||{};
+    cfg.heroEyebrow=localValue(settings,"aircraft.heroEyebrow",cfg.heroEyebrow);
+    cfg.heroTitle=localValue(settings,"aircraft.heroTitle",cfg.heroTitle);
+    cfg.heroIntro=localValue(settings,"aircraft.heroIntro",cfg.heroIntro);
+    cfg.introLabel=localValue(settings,"aircraft.introLabel",cfg.introLabel);
+    cfg.introTitle=localValue(settings,"aircraft.introTitle",cfg.introTitle);
+    cfg.introText=localValue(settings,"aircraft.introText",cfg.introText);
+    cfg.note=localValue(settings,"aircraft.note",cfg.note);
+    for(var i=0;i<3;i++){
+      cfg.stats[i]=cfg.stats[i]||{};
+      cfg.stats[i].value=localValue(settings,"aircraft.stats."+i+".value",cfg.stats[i].value||"");
+      cfg.stats[i].text=localValue(settings,"aircraft.stats."+i+".text",cfg.stats[i].text||"");
+    }
+    return cfg;
+  }
+
   function baseConfig(customerKey) {
-    if (customerKey === "150th_aero") return JSON.parse(JSON.stringify(AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"]));
-    if (customerKey === "demo_flying_club") return JSON.parse(JSON.stringify(AIRCRAFT_PAGE_DEFAULTS["Test Customer"] || AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"]));
-    return JSON.parse(JSON.stringify(AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"]));
+    var cfg;
+    if (customerKey === "150th_aero") cfg=JSON.parse(JSON.stringify(AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"]));
+    else if (customerKey === "demo_flying_club") cfg=JSON.parse(JSON.stringify(AIRCRAFT_PAGE_DEFAULTS["Test Customer"] || AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"]));
+    else cfg=JSON.parse(JSON.stringify(AIRCRAFT_PAGE_DEFAULTS["150th Aero Flying Club"]));
+    return applyAircraftSettings(cfg,customerAircraftSettings(customerKey));
   }
 
   function localValue(local,key,fallback) {
@@ -250,6 +279,8 @@
       note:"Customer-owned Aircraft page copy and display controls. Aircraft records themselves belong in the Aircraft Manager, not in this page settings drawer.",
       getDefaults:function(ctx,api) {
         var key = (api && api.getState && api.getState().customerKey) || (ctx && ctx.customerKey) || "150th_aero";
+        var db = customerAircraftSettings(key);
+        if(db) return db;
         var cfg = baseConfig(key);
         return {
           "aircraft.heroEyebrow": cfg.heroEyebrow || "",

@@ -1,4 +1,4 @@
-/* COMPONENT-customer-style-v1.js | layout presets scoped away from side drawer | Generated: 2026-05-31 08:24:44 UTC */
+/* COMPONENT-customer-style-v1.js | customer-owned page settings support | Generated: 2026-05-31 16:09:55 UTC */
 (function () {
   "use strict";
   window.SyncEtc = window.SyncEtc || {};
@@ -67,6 +67,8 @@
     cfg.content=deepMerge(settings.content_overrides || {}, overrides.content || {});
     cfg.modules=settings.enabled_modules || {};
     cfg.rawSiteSettings=settings;
+    cfg.customerPageSettings=bundle.customer_page_settings||bundle.customerPageSettings||[];
+    cfg.customerPageSettingsByKey=bundle.customer_page_settings_by_key||bundle.customerPageSettingsByKey||{};
     cfg=deepMerge(cfg,overrides);
     cfg.theme=preset.theme || cfg.theme;
     return cfg;
@@ -78,6 +80,18 @@
       .then(function(r){return r.json().catch(function(){return null;}).then(function(body){if(!r.ok||!body||body.ok===false)throw new Error((body&&body.error)||"site settings read failed");return body;});})
       .then(function(bundle){cache[key]=bundle;return getCustomerConfig(key);})
       .catch(function(){return getCustomerConfig(key);});
+  }
+
+  function pageSettingsFor(customerConfig,pageKey){
+    var key=clean(pageKey);
+    if(!customerConfig||!key)return null;
+    var byKey=customerConfig.customerPageSettingsByKey||{};
+    if(byKey[key])return byKey[key];
+    var rows=customerConfig.customerPageSettings||[];
+    for(var i=0;i<rows.length;i++){
+      if(clean(rows[i]&&rows[i].page_key)===key)return rows[i];
+    }
+    return null;
   }
 
   function themeForPreset(customerConfig,presetKey){
@@ -210,6 +224,6 @@
     applyLayoutVars(rootEl,(customerConfig&&customerConfig.layout)||FALLBACK_LAYOUT_PRESETS[0].layout);
   }
 
-  window.SyncEtc.Components.CustomerStyle={version:VERSION,customers:DEFAULT_CUSTOMERS,fallbackPresets:FALLBACK_PRESETS,fallbackLayoutPresets:FALLBACK_LAYOUT_PRESETS,getCustomerConfig:getCustomerConfig,loadCustomerConfig:loadCustomerConfig,themeForPreset:themeForPreset,applyThemeVars:applyThemeVars,applyLayoutVars:applyLayoutVars,applyCustomerCssVars:applyCustomerCssVars};
+  window.SyncEtc.Components.CustomerStyle={version:VERSION,customers:DEFAULT_CUSTOMERS,fallbackPresets:FALLBACK_PRESETS,fallbackLayoutPresets:FALLBACK_LAYOUT_PRESETS,getCustomerConfig:getCustomerConfig,loadCustomerConfig:loadCustomerConfig,themeForPreset:themeForPreset,pageSettingsFor:pageSettingsFor,applyThemeVars:applyThemeVars,applyLayoutVars:applyLayoutVars,applyCustomerCssVars:applyCustomerCssVars};
 })();
 /* COMPONENT-customer-style-v1.js - END */

@@ -1,4 +1,4 @@
-/* COMPONENT-customer-settings-v1.js | left-align default text | Generated: 2026-05-31 06:53:53 UTC */
+/* COMPONENT-customer-settings-v1.js | customer-owned Supabase page settings | Generated: 2026-05-31 16:09:55 UTC */
 (function(){
 "use strict";
 window.SyncEtc=window.SyncEtc||{};
@@ -111,9 +111,32 @@ function esc(v){return U().esc(v);}
 function clean(v){return v==null?"":String(v).trim();}
 function nested(o,path,fallback){try{return path.split(".").reduce(function(a,k){return a&&a[k];},o)||fallback||"";}catch(e){return fallback||"";}}
 function pageKeyFromCtx(ctx){return (ctx&&ctx.pageKey)||"calendar";}
+function customerPageSettingsRow(ctx,key){
+  try{
+    var c=ctx&&ctx.customer?ctx.customer:{};
+    var byKey=c.customerPageSettingsByKey||{};
+    if(byKey&&byKey[key])return byKey[key];
+    var rows=c.customerPageSettings||[];
+    for(var i=0;i<rows.length;i++){
+      if(clean(rows[i]&&rows[i].page_key)===clean(key))return rows[i];
+    }
+  }catch(e){}
+  return null;
+}
 function schemaFor(ctx){
   var key=pageKeyFromCtx(ctx);
-  return registry[key]||registry.default||defaultSchema(key);
+  var base=registry[key]||registry.default||defaultSchema(key);
+  var row=customerPageSettingsRow(ctx,key);
+  if(!row)return base;
+  var fields=Array.isArray(row.fields_json)?row.fields_json:base.fields;
+  return Object.assign({},base,{
+    pageKey:key,
+    pageLabel:row.page_label||base.pageLabel,
+    note:row.note||base.note,
+    fields:fields,
+    source_template_key:row.source_template_key||base.source_template_key,
+    getDefaults:function(){return row.settings_json||{};}
+  });
 }
 function defaultSchema(key){
   var label=(key||"Page").replace(/[-_]/g," ").replace(/\b\w/g,function(m){return m.toUpperCase();});
@@ -149,7 +172,7 @@ function installStyles(){
     .se-customer-settings-control textarea{min-height:78px;resize:vertical}
     .se-customer-settings-control small{display:block;margin-top:4px;color:#64748b;font-size:11px;line-height:1.35}
     .se-customer-settings-control.is-deleted input,.se-customer-settings-control.is-deleted textarea{background:#fffaf0;border-style:dashed}
-    .se-cs-default-link{display:inline!important;width:auto!important;min-height:0!important;border:0!important;background:transparent!important;color:#12365a!important;text-decoration:underline;text-underline-offset:2px;font:inherit!important;font-weight:900!important;cursor:pointer;padding:0!important;line-height:inherit!important;text-align:left!important;justify-content:flex-start!important;box-shadow:none!important;border-radius:0!important}
+    .se-cs-default-link{display:inline;border:0;background:transparent;color:#12365a!important;text-decoration:underline;text-underline-offset:2px;font:inherit;font-weight:900;cursor:pointer;padding:0;line-height:inherit}
     .se-customer-settings-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
     .se-customer-settings-actions button,.se-manager-link{border:1px solid rgba(18,54,90,.20);border-radius:999px;padding:9px 11px;background:#12365a;color:#fff!important;font-weight:900;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
     .se-customer-settings-actions button.secondary,.se-manager-link.secondary{background:#fff;color:#12365a!important}
@@ -269,20 +292,17 @@ function currentValues(api,schema){
   return values;
 }
 function buildPayload(api,schema){
-  var c=api.customer(), content=c.content||{}, local=api.getState().local||{}, values=currentValues(api,schema);
-  var pageKey=schema.pageKey||api.getState().pageKey||"page";
-  var modes={};
-  (schema.fields||[]).forEach(function(f){modes[f.key]=clean(values[f.key])===""?"hidden":"custom";});
-  var contentOverrides=Object.assign({},content);
-  contentOverrides[pageKey]=Object.assign({},contentOverrides[pageKey]||{},values,{__field_modes:modes});
+  var values=currentValues(api,schema);
+  var state=api.getState?api.getState():{};
+  var pageKey=schema.pageKey||state.pageKey||"page";
   return {
-    customer_key:api.getState().customerKey,
-    style_preset_key:local.stylePresetKey||c.stylePresetKey||"classic-aviation",
-    theme_overrides:{},
-    brand_overrides:{},
-    content_overrides:contentOverrides,
-    module_overrides:{layout:{preset:local.layoutPresetKey||nested(c,"layout.preset","standard-layout")}},
-    enabled_modules:c.modules||{},
+    customer_key:state.customerKey,
+    page_key:pageKey,
+    page_label:schema.pageLabel||pageKey,
+    note:schema.note||"",
+    settings_json:values,
+    fields_json:schema.fields||[],
+    source_template_key:schema.source_template_key||null,
     is_enabled:true
   };
 }
@@ -292,7 +312,7 @@ function save(api,root,schema){
   setStatus(root,"Saving...","");
   fetch(ACTION_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({action:"save_customer_page_settings",payload:buildPayload(api,schema)})})
   .then(function(r){return r.json().catch(function(){return null;}).then(function(body){if(!r.ok||!body||body.ok===false)throw new Error((body&&body.error)||"Save failed");return body;});})
-  .then(function(){markClean();setStatus(root,"Saved customer page settings.","good");})
+  .then(function(){markClean();setStatus(root,"Saved customer page settings.","good"); if(api.loadCustomer)api.loadCustomer().catch(function(){});})
   .catch(function(err){setStatus(root,"Save failed: "+(err.message||err),"warn");});
 }
 function setStatus(root,msg,cls){
