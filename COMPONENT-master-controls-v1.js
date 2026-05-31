@@ -1,4 +1,4 @@
-/* COMPONENT-master-controls-v1.js | view-as button grid + no scroll jump support | Generated: 2026-05-31 07:10:45 UTC */
+/* COMPONENT-master-controls-v1.js | discard-safe Site Editor + aligned buttons | Generated: 2026-05-31 07:22:30 UTC */
 /* COMPONENT-master-controls-v1.js - BEGIN */
 (function(){
 "use strict";
@@ -7,6 +7,8 @@ window.SyncEtc.Components=window.SyncEtc.Components||{};
 var VERSION="COMPONENT-master-controls-v1";
 var ACTION_URL="https://ocdaohkiwonjmirqkjww.supabase.co/functions/v1/syncetc-site-settings-action";
 var siteEditorDirty=false;
+var currentApi=null;
+var currentRoot=null;
 var beforeUnloadInstalled=false;
 var dirtyGuardInstalled=false;
 var lastCustomerSelectValue="";
@@ -34,12 +36,24 @@ function markClean(root,msg){
   if(root)markStatus(root,msg||"Saved customer site settings.","good");
 }
 
+function discardSiteEditorPreview(reason){
+  siteEditorDirty=false;
+  try{
+    if(currentApi&&currentApi.clearSiteEditorLocal)currentApi.clearSiteEditorLocal();
+    else if(currentApi&&currentApi.setLocal){
+      currentApi.setLocal("stylePresetKey",null);
+      currentApi.setLocal("layoutPresetKey",null);
+    }
+    if(currentRoot)markStatus(currentRoot,"Unsaved Site Editor changes discarded.","");
+  }catch(err){}
+}
+
 function confirmDiscardUnsaved(reason){
   if(!siteEditorDirty)return true;
   var msg="You have unsaved Site Editor changes. Continue and discard those changes?";
   if(reason)msg+="\n\nAction: "+reason;
   var ok=window.confirm(msg);
-  if(ok)siteEditorDirty=false;
+  if(ok)discardSiteEditorPreview(reason);
   return ok;
 }
 
@@ -223,6 +237,8 @@ function signOutAndReload(){
   setTimeout(function(){window.location.reload();},220);
 }
 function bind(api,root){
+  currentApi=api;
+  currentRoot=root&&root.querySelector?root.querySelector("[data-se-editor]"):null;
   var editor=root.querySelector("[data-se-editor]");
   if(!editor||editor.getAttribute("data-se-bound")==="1")return;
   editor.setAttribute("data-se-bound","1");
@@ -271,8 +287,9 @@ function bind(api,root){
 
     if(t.closest("[data-se-reset]")){
       if(siteEditorDirty&&!window.confirm("Reset local Site Editor changes?"))return;
-      siteEditorDirty=false;
-      window.location.reload();
+      discardSiteEditorPreview("reset local changes");
+      if(api.render)api.render(api.getState&&api.getState().lastPageHtml?api.getState().lastPageHtml:"");
+      else window.location.reload();
       return;
     }
   });
@@ -316,14 +333,10 @@ function handleLocal(api,editor,t){
     var c=api.customer();
     var theme=window.SyncEtc.Components.CustomerStyle.themeForPreset(c,value);
     window.SyncEtc.Components.CustomerStyle.applyThemeVars(document.getElementById("syncetc-component-shell"),theme);
-    var label=t.options[t.selectedIndex]?t.options[t.selectedIndex].textContent:value;
-    setText("[data-se-preview-preset]",label);
     markStatus(editor,"Unsaved style preset change. Click Save Site Settings to persist.","warn");
   }
 
   if(field==="layoutPresetKey"){
-    var layoutLabel=t.options[t.selectedIndex]?t.options[t.selectedIndex].textContent:value;
-    setText("[data-se-preview-layout]",layoutLabel);
     markStatus(editor,"Unsaved layout preset change. Click Save Site Settings to persist.","warn");
   }
 }

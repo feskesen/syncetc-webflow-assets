@@ -1,4 +1,4 @@
-/* COMPONENT-site-shell-v1.js | drawer scroll stable v2 | Generated: 2026-05-31 07:10:45 UTC */
+/* COMPONENT-site-shell-v1.js | discard Site Editor preview safely | Generated: 2026-05-31 07:22:30 UTC */
 /* COMPONENT-site-shell-v1.js - BEGIN */
 (function () {
   "use strict";
@@ -50,7 +50,16 @@
     function effectiveAudience(){if(state.viewAs==="platform"||state.viewAs==="admin")return"admin";if(state.viewAs==="member")return"member";return"public";}
     function customer(){return window.SyncEtc.Components.CustomerStyle.getCustomerConfig(state.customerKey,state.local||{});}
     function loadCustomer(){return window.SyncEtc.Components.CustomerStyle.loadCustomerConfig(state.customerKey).then(function(c){state.customerName=c.customerName||customerNameFromKey(state.customerKey);return c;});}
-    function setLocal(field,value){state.local[field]=value;}
+    function setLocal(field,value){if(value===null||value===undefined)delete state.local[field];else state.local[field]=value;}
+    function clearSiteEditorLocal(){
+      delete state.local.stylePresetKey;
+      delete state.local.layoutPresetKey;
+      state.loadedCustomerKey="";
+      state.loadingCustomerKey="";
+      try{
+        loadCustomer().then(function(){render(state.lastPageHtml||"");}).catch(function(){render(state.lastPageHtml||"");});
+      }catch(e){render(state.lastPageHtml||"");}
+    }
     function setViewAs(value){state.viewAsManuallySet=true;state.viewAs=value||"public";state.audience=effectiveAudience();}
     function setCustomerKey(value){state.customerKey=value||"demo_flying_club";state.customerName=customerNameFromKey(state.customerKey);state.local={};state.loadedCustomerKey="";state.loadingCustomerKey="";}
     function setEditorOpen(value){state.siteEditorOpen=!!value;state.drawerOpen=!!value;if(value)state.drawerTab="site";}
@@ -203,7 +212,7 @@
     }
 
     try{document.addEventListener("syncetc:auth-soft-change",function(){applyDefaultViewAsFromRealRole();render(state.lastPageHtml||"");});}catch(e){}
-    var api={render:render,customer:customer,loadCustomer:loadCustomer,getState:getState,setLocal:setLocal,setViewAs:setViewAs,setCustomerKey:setCustomerKey,setEditorOpen:setEditorOpen,setCustomerSettingsOpen:setCustomerSettingsOpen,setDrawerOpen:setDrawerOpen,setDrawerTab:setDrawerTab,getSavePayload:getSavePayload};
+    var api={render:render,customer:customer,loadCustomer:loadCustomer,getState:getState,setLocal:setLocal,clearSiteEditorLocal:clearSiteEditorLocal,setViewAs:setViewAs,setCustomerKey:setCustomerKey,setEditorOpen:setEditorOpen,setCustomerSettingsOpen:setCustomerSettingsOpen,setDrawerOpen:setDrawerOpen,setDrawerTab:setDrawerTab,getSavePayload:getSavePayload};
     return api;
   }
   window.SyncEtc.Components.SiteShell={create:create,version:VERSION};
