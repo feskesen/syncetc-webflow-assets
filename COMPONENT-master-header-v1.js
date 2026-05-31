@@ -1,4 +1,4 @@
-/* COMPONENT-master-header-v1.js - BEGIN */
+/* COMPONENT-master-header-v1.js - BEGIN | real relative links */
 (function () {
   "use strict";
 
@@ -89,12 +89,22 @@
     const showMember = roleAllowsMember(s, audience);
     const showAdmin = roleAllowsAdmin(s, audience);
 
-    function navLink(label) {
-      return '<a class="club-nav-link" href="#">' + U.esc(label) + '</a>';
+    const routeMap = {
+      home: "/",
+      info: "/info",
+      aircraft: "/aircraft",
+      events: "/calendar",
+      calendar: "/calendar"
+    };
+
+    function navLink(label, href) {
+      return '<a class="club-nav-link" href="' + U.esc(href || "#") + '">' + U.esc(label) + '</a>';
     }
 
     function link(key, label) {
-      return '<a class="club-nav-link ' + (page === key ? 'is-active' : '') + '" href="#" data-se-page-link="' + U.esc(key) + '">' + U.esc(label) + '</a>';
+      var href = routeMap[key] || "#";
+      var active = page === key || (key === "events" && page === "calendar") || (key === "calendar" && page === "events");
+      return '<a class="club-nav-link ' + (active ? 'is-active' : '') + '" href="' + U.esc(href) + '" data-se-page-link="' + U.esc(key) + '">' + U.esc(label) + '</a>';
     }
 
     return `
@@ -209,4 +219,4 @@
 
   window.SyncEtc.Components.MasterHeader = { render: render, installStyles: installStyles, version: VERSION };
 })();
-/* COMPONENT-master-header-v1.js - END */
+/* COMPONENT-master-header-v1.js - END | real relative links */
