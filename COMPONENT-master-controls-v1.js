@@ -1,4 +1,4 @@
-/* COMPONENT-master-controls-v1.js | discard-safe Site Editor + aligned buttons | Generated: 2026-05-31 07:22:30 UTC */
+/* COMPONENT-master-controls-v1.js | non-sticky aligned Site Editor buttons | Generated: 2026-05-31 07:29:14 UTC */
 /* COMPONENT-master-controls-v1.js - BEGIN */
 (function(){
 "use strict";
