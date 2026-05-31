@@ -1,4 +1,4 @@
-/* PAGE-AIRCRAFT-v1.js - BEGIN */
+/* PAGE-AIRCRAFT-v1.js - BEGIN | hidden blank fields honored */
 (function () {
   "use strict";
 
@@ -287,28 +287,52 @@
   }
 
   function inlineText(v) { return esc(v).replace(/\*([^*]+)\*/g, "<em>$1</em>"); }
+  function hasText(v) { return String(v == null ? "" : v).trim() !== ""; }
 
   function renderAircraftPage(customerKey,local) {
     installStyles();
     var cfg = configFor(customerKey,local||{});
     var stats = Array.isArray(cfg.stats) ? cfg.stats : [];
     var rows = Array.isArray(cfg.aircraft) ? cfg.aircraft.slice().sort(function(a,b) { return (a.sortOrder || 999) - (b.sortOrder || 999); }) : [];
-    function statMarkup(s) { return '<div class="aero-fleet-stat"><strong>' + esc(s.value || '') + '</strong><span>' + esc(s.text || '') + '</span></div>'; }
+
+    function statMarkup(s) {
+      var value = hasText(s && s.value) ? '<strong>' + esc(s.value) + '</strong>' : '';
+      var text = hasText(s && s.text) ? '<span>' + esc(s.text) + '</span>' : '';
+      if(!value && !text) return '';
+      return '<div class="aero-fleet-stat">' + value + text + '</div>';
+    }
+
     function labelFor(ac) { return String(ac.tailNumber || '').toUpperCase() === 'N150TH' ? 'Flagship Aircraft' : 'Club Aircraft'; }
     function metaFor(ac) { return [ac.modelYear, ac.aircraftType].filter(Boolean).join(' '); }
+
     function detailsMarkup(ac) {
       var parts = String(ac.details || '').split('||').map(function(x) { return x.trim(); }).filter(Boolean);
       if (!parts.length) return '<p>Aircraft details are not available at this time.</p>';
       var intro = parts.shift();
       return (intro ? '<p>' + inlineText(intro) + '</p>' : '') + (parts.length ? '<ul>' + parts.map(function(x) { return '<li>' + inlineText(x) + '</li>'; }).join('') + '</ul>' : '');
     }
+
     function photoCard(url, label, alt) {
       return '<div class="aero-aircraft-photo-card">' + (url ? '<img src="' + esc(url) + '" alt="' + esc(alt || label) + '">' : '<div class="aero-aircraft-placeholder">' + esc(label) + ' photo not available</div>') + '<div class="aero-aircraft-photo-label">' + esc(label) + '</div></div>';
     }
+
     function aircraftCard(ac) {
       return '<article class="aero-aircraft-card"><div class="aero-aircraft-copy"><div class="aero-section-label">' + esc(labelFor(ac)) + '</div><div class="aero-aircraft-header"><h2 class="aero-tail-number">' + esc(ac.tailNumber || 'Aircraft') + '</h2><div class="aero-aircraft-meta">' + esc(metaFor(ac) || 'Aircraft Details') + '</div></div>' + detailsMarkup(ac) + '</div><div class="aero-aircraft-media">' + photoCard(ac.aircraftPhoto, 'Exterior', (ac.tailNumber || 'Aircraft') + ' exterior aircraft photo') + photoCard(ac.panelPhoto, 'Panel', (ac.tailNumber || 'Aircraft') + ' panel photo') + '</div></article>';
     }
-    return '<div class="aero-fleet-page"><div class="aero-fleet-shell"><section class="aero-fleet-hero"><div class="aero-fleet-eyebrow">' + esc(cfg.heroEyebrow) + '</div><h1>' + esc(cfg.heroTitle) + '</h1><p>' + esc(cfg.heroIntro) + '</p><div class="aero-fleet-stats">' + stats.map(statMarkup).join('') + '</div></section><main class="aero-fleet-main"><section class="aero-fleet-intro-card"><div class="aero-section-label">' + esc(cfg.introLabel) + '</div><h2>' + esc(cfg.introTitle) + '</h2><p>' + esc(cfg.introText) + '</p></section><section class="aero-aircraft-list">' + (rows.length ? rows.map(aircraftCard).join('') : '<div class="aero-empty-message">Aircraft information is not available at this time.</div>') + '</section><div class="aero-note-strip"><strong>Note:</strong> ' + esc(cfg.note || '') + '</div></main></div></div>';
+
+    var heroEyebrow = hasText(cfg.heroEyebrow) ? '<div class="aero-fleet-eyebrow">' + esc(cfg.heroEyebrow) + '</div>' : '';
+    var heroTitle = hasText(cfg.heroTitle) ? '<h1>' + esc(cfg.heroTitle) + '</h1>' : '';
+    var heroIntro = hasText(cfg.heroIntro) ? '<p>' + esc(cfg.heroIntro) + '</p>' : '';
+    var statHtml = stats.map(statMarkup).filter(Boolean).join('');
+    var statsBlock = statHtml ? '<div class="aero-fleet-stats">' + statHtml + '</div>' : '';
+
+    var introLabel = hasText(cfg.introLabel) ? '<div class="aero-section-label">' + esc(cfg.introLabel) + '</div>' : '';
+    var introTitle = hasText(cfg.introTitle) ? '<h2>' + esc(cfg.introTitle) + '</h2>' : '';
+    var introText = hasText(cfg.introText) ? '<p>' + esc(cfg.introText) + '</p>' : '';
+    var introBlock = (introLabel || introTitle || introText) ? '<section class="aero-fleet-intro-card">' + introLabel + introTitle + introText + '</section>' : '';
+    var noteBlock = hasText(cfg.note) ? '<div class="aero-note-strip"><strong>Note:</strong> ' + esc(cfg.note) + '</div>' : '';
+
+    return '<div class="aero-fleet-page"><div class="aero-fleet-shell"><section class="aero-fleet-hero">' + heroEyebrow + heroTitle + heroIntro + statsBlock + '</section><main class="aero-fleet-main">' + introBlock + '<section class="aero-aircraft-list">' + (rows.length ? rows.map(aircraftCard).join('') : '<div class="aero-empty-message">Aircraft information is not available at this time.</div>') + '</section>' + noteBlock + '</main></div></div>';
   }
 
   function shellState(shell) { try { return shell.getState ? shell.getState() : {}; } catch(e) { return {}; } }
@@ -357,4 +381,4 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
 })();
-/* PAGE-AIRCRAFT-v1.js - END */
+/* PAGE-AIRCRAFT-v1.js - END | hidden blank fields honored */

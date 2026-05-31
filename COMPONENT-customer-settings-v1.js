@@ -1,4 +1,4 @@
-/* COMPONENT-customer-settings-v1.js - BEGIN | debounce + dirty guard + blank-means-hidden */
+/* COMPONENT-customer-settings-v1.js - BEGIN | clean default restore + dirty guards */
 (function(){
 "use strict";
 window.SyncEtc=window.SyncEtc||{};
@@ -56,16 +56,12 @@ function ensureDirtyActionGuard(){
 
   document.addEventListener("focusin",function(e){
     var t=e.target;
-    if(t&&t.matches&&t.matches("[data-se-customer]")){
-      lastCustomerSelectValue=t.value;
-    }
+    if(t&&t.matches&&t.matches("[data-se-customer]"))lastCustomerSelectValue=t.value;
   },true);
 
   document.addEventListener("mousedown",function(e){
     var t=e.target;
-    if(t&&t.matches&&t.matches("[data-se-customer]")){
-      lastCustomerSelectValue=t.value;
-    }
+    if(t&&t.matches&&t.matches("[data-se-customer]"))lastCustomerSelectValue=t.value;
   },true);
 
   document.addEventListener("click",function(e){
@@ -73,9 +69,7 @@ function ensureDirtyActionGuard(){
     var t=e.target;
     if(!t||!t.closest)return;
 
-    if(t.closest("[data-se-drawer-close]")){
-      return; // Closing the drawer preserves staged edits on the current page.
-    }
+    if(t.closest("[data-se-drawer-close]"))return;
 
     if(t.closest("[data-se-drawer-signout]")||t.closest("[data-se-auth-logout]")||t.closest("[data-se-signout]")){
       if(!confirmDiscardUnsaved("sign out")){
@@ -98,7 +92,6 @@ function ensureDirtyActionGuard(){
     if(!hasUnsavedCustomerSettings)return;
     var t=e.target;
     if(!t||!t.matches)return;
-
     if(t.matches("[data-se-customer]")){
       var attempted=t.value;
       if(!confirmDiscardUnsaved("switch customer")){
@@ -127,7 +120,7 @@ function defaultSchema(key){
   return {
     pageKey:key,
     pageLabel:label,
-    note:"Customer-owned page copy controls. These values override SyncEtc defaults for this customer. If blank, pages can fall back to the platform default.",
+    note:"Customer-owned page copy controls. Click a default value under any field to restore that field only. Delete all text to hide that field on pages that support hiding. Use Restore SyncEtc Defaults to restore all fields on this page.",
     fields:[
       {key:key+".heroTitle",label:label+" Hero Title",type:"text",defaultValue:label},
       {key:key+".heroIntro",label:label+" Intro",type:"textarea",defaultValue:""}
@@ -156,7 +149,7 @@ function installStyles(){
     .se-customer-settings-control textarea{min-height:78px;resize:vertical}
     .se-customer-settings-control small{display:block;margin-top:4px;color:#64748b;font-size:11px;line-height:1.35}
     .se-customer-settings-control.is-deleted input,.se-customer-settings-control.is-deleted textarea{background:#fffaf0;border-style:dashed}
-    .se-cs-default-link{display:inline;border:0;background:transparent;color:#12365a!important;text-decoration:underline;text-underline-offset:2px;font:inherit;font-weight:900;cursor:pointer;padding:0}
+    .se-cs-default-link{display:inline;border:0;background:transparent;color:#12365a!important;text-decoration:underline;text-underline-offset:2px;font:inherit;font-weight:900;cursor:pointer;padding:0;line-height:inherit}
     .se-customer-settings-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
     .se-customer-settings-actions button,.se-manager-link{border:1px solid rgba(18,54,90,.20);border-radius:999px;padding:9px 11px;background:#12365a;color:#fff!important;font-weight:900;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
     .se-customer-settings-actions button.secondary,.se-manager-link.secondary{background:#fff;color:#12365a!important}
@@ -192,7 +185,6 @@ function renderField(field,value,def){
   var isBlank=clean(value)==="";
   var help='<small>Default: <button type="button" class="se-cs-default-link" data-cs-restore-one="'+esc(field.key)+'">'+esc(def||"blank")+'</button></small>';
   if(field.help)help+='<small>'+esc(field.help)+'</small>';
-  help+='<small>'+(isBlank?'This field is marked hidden/deleted. Type custom text to restore it.':'Delete all text to hide this field on pages that support hiding.')+'</small>';
   var placeholder=isBlank?' placeholder="Deleted — type here to restore custom text"':'';
   if(tag==="textarea"){
     return '<label class="se-customer-settings-control '+(isBlank?'is-deleted':'')+'"><span>'+esc(field.label||field.key)+'</span><textarea data-cs-local="'+esc(field.key)+'"'+placeholder+'>'+esc(value)+'</textarea>'+help+'</label>';
@@ -280,9 +272,7 @@ function buildPayload(api,schema){
   var c=api.customer(), content=c.content||{}, local=api.getState().local||{}, values=currentValues(api,schema);
   var pageKey=schema.pageKey||api.getState().pageKey||"page";
   var modes={};
-  (schema.fields||[]).forEach(function(f){
-    modes[f.key]=clean(values[f.key])===""?"hidden":"custom";
-  });
+  (schema.fields||[]).forEach(function(f){modes[f.key]=clean(values[f.key])===""?"hidden":"custom";});
   var contentOverrides=Object.assign({},content);
   contentOverrides[pageKey]=Object.assign({},contentOverrides[pageKey]||{},values,{__field_modes:modes});
   return {
@@ -464,4 +454,4 @@ function bind(api,root){
 }
 window.SyncEtc.Components.CustomerSettings={version:VERSION,render:render,bind:bind,installStyles:installStyles,canRender:canRender,registerPage:registerPage,getRegisteredPage:getRegisteredPage};
 })();
-/* COMPONENT-customer-settings-v1.js - END | debounce + dirty guard + blank-means-hidden */
+/* COMPONENT-customer-settings-v1.js - END | clean default restore + dirty guards */
