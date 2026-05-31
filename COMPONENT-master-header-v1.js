@@ -1,4 +1,4 @@
-/* COMPONENT-master-header-v1.js - BEGIN | real relative links */
+/* COMPONENT-master-header-v1.js - BEGIN | real relative links + auth sync */
 (function () {
   "use strict";
 
@@ -59,7 +59,53 @@
   }
 
   function snapshot() {
-    return window.SyncEtc.AuthContext ? window.SyncEtc.AuthContext.getSnapshot() : {};
+    try {
+      if (window.SyncEtc.SecurityContext && window.SyncEtc.SecurityContext.getSnapshot) {
+        const sec = window.SyncEtc.SecurityContext.getSnapshot() || {};
+        const hasSecurityIdentity = !!(
+          sec.signed_in ||
+          sec.actor_email ||
+          sec.user_email ||
+          sec.platform_role ||
+          sec.active_customer_role ||
+          sec.active_customer_role_rank
+        );
+        if (hasSecurityIdentity) return sec;
+      }
+    } catch (err) {}
+
+    try {
+      if (window.SyncEtc.AuthContext && window.SyncEtc.AuthContext.getSnapshot) {
+        return window.SyncEtc.AuthContext.getSnapshot() || {};
+      }
+    } catch (err) {}
+
+    return {};
+  }
+
+  function isSignedInSnapshot(s) {
+    if (!s) return false;
+    if (s.signed_in === true) return true;
+    if (s.user && (s.user.email || s.user.id)) return true;
+    if (s.actor_email || s.user_email || s.email) return true;
+    if (s.platform_role || s.active_customer_role) return true;
+    return false;
+  }
+
+  function emailFromSnapshot(s) {
+    if (!s) return "";
+    if (s.user && s.user.email) return s.user.email;
+    return s.actor_email || s.user_email || s.email || "";
+  }
+
+  function activeCustomerLabel(s, fallbackCustomer) {
+    if (!s) return fallbackCustomer || "";
+    if (s.active_customer && s.active_customer.syncetc_customers && s.active_customer.syncetc_customers.display_name) {
+      return s.active_customer.syncetc_customers.display_name;
+    }
+    if (s.active_customer_display_name) return s.active_customer_display_name;
+    if (s.customer_name) return s.customer_name;
+    return fallbackCustomer || "";
   }
 
   function logoMarkup(customer) {
@@ -71,13 +117,14 @@
 
   function roleAllowsMember(s, audience) {
     if (audience === "member" || audience === "admin") return true;
-    return !!(s && s.signed_in);
+    return isSignedInSnapshot(s);
   }
 
   function roleAllowsAdmin(s, audience) {
     if (audience === "admin") return true;
-    if (!s || !s.signed_in) return false;
+    if (!isSignedInSnapshot(s)) return false;
     if (s.is_syncetc_super_admin) return true;
+    if (s.platform_role && String(s.platform_role).toLowerCase().indexOf("admin") >= 0) return true;
     return Number(s.active_customer_role_rank || 0) >= 400;
   }
 
@@ -122,14 +169,13 @@
   function authButtons(customer) {
     const U = window.SyncEtc.Components.Utils;
     const s = snapshot();
-    const signedIn = !!s.signed_in;
-    const email = signedIn && s.user ? s.user.email || "" : "";
-    const activeCustomer = s.active_customer && s.active_customer.syncetc_customers ? s.active_customer.syncetc_customers.display_name : "";
-    const label = activeCustomer || customer.fullName || customer.shortName || "SyncEtc";
+    const signedIn = isSignedInSnapshot(s);
+    const email = emailFromSnapshot(s);
+    const label = activeCustomerLabel(s, customer.fullName || customer.shortName || "SyncEtc");
     return '<div class="club-auth-buttons">' +
-      (signedIn ? '<span class="club-auth-user">' + U.esc(email) + (label ? ' · ' + U.esc(label) : '') + '</span>' : '') +
-      (!signedIn ? '<button class="club-auth-btn login" type="button" data-se-auth-open>Login</button>' : '') +
-      (signedIn ? '<button class="club-auth-btn logout" type="button" data-se-auth-logout>Not you? Sign out</button>' : '') +
+      (signedIn ? '<span class="club-auth-user">' + U.esc(email || "signed in") + (label ? ' · ' + U.esc(label) : '') + '</span>' : '') +
+      (!signedIn ? '<button class="club-auth-btn login" type="button" data-se-auth-open>Log in</button>' : '') +
+      (signedIn ? '<button class="club-auth-btn logout" type="button" data-se-auth-logout>Log off</button>' : '') +
     '</div>';
   }
 
@@ -141,8 +187,7 @@
 
   function signedInNow() {
     try {
-      const s = snapshot();
-      if (s && s.signed_in) return true;
+      if (isSignedInSnapshot(snapshot())) return true;
     } catch (err) {}
     try {
       if (window.SyncEtc && window.SyncEtc.SecurityContext && window.SyncEtc.SecurityContext.getToken) {
@@ -219,4 +264,4 @@
 
   window.SyncEtc.Components.MasterHeader = { render: render, installStyles: installStyles, version: VERSION };
 })();
-/* COMPONENT-master-header-v1.js - END | real relative links */
+/* COMPONENT-master-header-v1.js - END | real relative links + auth sync */
