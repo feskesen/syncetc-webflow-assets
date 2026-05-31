@@ -1,4 +1,4 @@
-/* COMPONENT-customer-settings-v1.js - BEGIN */
+/* COMPONENT-customer-settings-v1.js - BEGIN | Side drawer typing debounce fix */
 (function(){
 "use strict";
 window.SyncEtc=window.SyncEtc||{};
@@ -209,8 +209,33 @@ function bind(api,root){
   box.setAttribute("data-cs-bound","1");
   var schema=schemaFor({pageKey:api.getState().pageKey,customerKey:api.getState().customerKey,customer:api.customer(),local:api.getState().local});
   var restoreBackup=null;
+  var typingTimer=null;
+
+  function schedulePreviewUpdate(){
+    if(typingTimer)clearTimeout(typingTimer);
+    typingTimer=setTimeout(function(){
+      typingTimer=null;
+      dispatchLocalChange(schema,api);
+    },650);
+  }
+
+  function flushPreviewUpdate(){
+    if(typingTimer){
+      clearTimeout(typingTimer);
+      typingTimer=null;
+    }
+    dispatchLocalChange(schema,api);
+  }
+
   box.addEventListener("click",function(e){
-    if(e.target.closest("[data-cs-save]")){save(api,box,schema);return;}
+    if(e.target.closest("[data-cs-save]")){
+      if(typingTimer){
+        clearTimeout(typingTimer);
+        typingTimer=null;
+      }
+      save(api,box,schema);
+      return;
+    }
     if(e.target.closest("[data-cs-restore]")){
       var local=api.getState().local||{};
       restoreBackup={};
@@ -223,7 +248,7 @@ function bind(api,root){
         setInput(box,f.key,v);
       });
       var undo=box.querySelector("[data-cs-undo]");if(undo)undo.disabled=false;
-      dispatchLocalChange(schema,api);
+      flushPreviewUpdate();
       setStatus(box,"Defaults restored locally. Save to persist.","");
       return;
     }
@@ -235,24 +260,39 @@ function bind(api,root){
         setInput(box,f.key,v);
       });
       e.target.disabled=true;
-      dispatchLocalChange(schema,api);
+      flushPreviewUpdate();
       setStatus(box,"Restore undone locally. Save to persist.","");
       return;
     }
     if(e.target.closest("[data-cs-clear]")){
       (schema.fields||[]).forEach(function(f){api.setLocal(f.key,"");setInput(box,f.key,"");});
-      dispatchLocalChange(schema,api);
+      flushPreviewUpdate();
       setStatus(box,"Copy fields cleared locally. Save to persist.","");
       return;
     }
   });
+
   box.addEventListener("input",function(e){
     var field=e.target&&e.target.getAttribute&&e.target.getAttribute("data-cs-local");
     if(!field)return;
     api.setLocal(field,e.target.value);
-    dispatchLocalChange(schema,api);
+    schedulePreviewUpdate();
   });
+
+  box.addEventListener("change",function(e){
+    var field=e.target&&e.target.getAttribute&&e.target.getAttribute("data-cs-local");
+    if(!field)return;
+    api.setLocal(field,e.target.value);
+    flushPreviewUpdate();
+  });
+
+  box.addEventListener("blur",function(e){
+    var field=e.target&&e.target.getAttribute&&e.target.getAttribute("data-cs-local");
+    if(!field)return;
+    api.setLocal(field,e.target.value);
+    flushPreviewUpdate();
+  },true);
 }
 window.SyncEtc.Components.CustomerSettings={version:VERSION,render:render,bind:bind,installStyles:installStyles,canRender:canRender,registerPage:registerPage,getRegisteredPage:getRegisteredPage};
 })();
-/* COMPONENT-customer-settings-v1.js - END */
+/* COMPONENT-customer-settings-v1.js - END | Side drawer typing debounce fix */
