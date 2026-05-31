@@ -1,4 +1,4 @@
-/* COMPONENT-customer-style-v1.js | visible layout preset variables | Generated: 2026-05-31 08:15:12 UTC */
+/* COMPONENT-customer-style-v1.js | layout presets scoped away from side drawer | Generated: 2026-05-31 08:24:44 UTC */
 (function () {
   "use strict";
   window.SyncEtc = window.SyncEtc || {};
@@ -101,13 +101,55 @@
     var style=document.createElement("style");
     style.id="syncetc-layout-preset-visible-vars";
     style.textContent=[
-      ".syncetc-shell{max-width:var(--se-layout-shell-max,1180px)!important;margin-left:auto!important;margin-right:auto!important;}",
-      ".syncetc-shell main{display:block!important;}",
-      ".syncetc-shell section{margin-bottom:var(--se-layout-section-gap,24px)!important;}",
-      ".syncetc-shell button:not(.syncetc-admin-fab):not(.se-top-signout):not(.se-toggle){border-radius:var(--se-layout-button-radius,999px)!important;}",
-      ".syncetc-shell .club-header-card,.syncetc-shell [class*='card'],.syncetc-shell [class*='panel'],.syncetc-shell [class*='tile'],.syncetc-shell [class*='stat'],.syncetc-shell [class*='hero'],.syncetc-shell [class*='section']{border-radius:var(--se-layout-card-radius,18px)!important;box-shadow:var(--se-layout-card-shadow,none)!important;}",
-      ".syncetc-shell [class*='hero']{min-height:var(--se-layout-hero-min,auto)!important;padding-top:var(--se-layout-hero-pad-y,inherit)!important;padding-bottom:var(--se-layout-hero-pad-y,inherit)!important;}",
-      ".syncetc-shell .club-header-wrapper{padding-top:var(--se-layout-nav-pad-y,inherit)!important;padding-bottom:var(--se-layout-nav-pad-y,inherit)!important;}"
+      "/* Layout presets intentionally affect rendered customer site only, never the admin side drawer. */",
+
+      "#syncetc-component-shell{max-width:var(--se-layout-shell-max,1180px)!important;margin-left:auto!important;margin-right:auto!important;}",
+
+      "#syncetc-component-shell > main{display:block!important;}",
+      "#syncetc-component-shell > main section{margin-bottom:var(--se-layout-section-gap,24px)!important;}",
+
+      "#syncetc-component-shell > main button,",
+      "#syncetc-component-shell > main a[class*='button'],",
+      "#syncetc-component-shell > main [class*='btn'],",
+      "#syncetc-component-shell > .club-header-wrapper button,",
+      "#syncetc-component-shell > .club-header-wrapper a[class*='button'],",
+      "#syncetc-component-shell > .club-header-wrapper [class*='btn'],",
+      "#syncetc-component-shell > footer button,",
+      "#syncetc-component-shell > footer a[class*='button'],",
+      "#syncetc-component-shell > footer [class*='btn']{",
+      "border-radius:var(--se-layout-button-radius,999px)!important;",
+      "}",
+
+      "#syncetc-component-shell > main [class*='card'],",
+      "#syncetc-component-shell > main [class*='panel'],",
+      "#syncetc-component-shell > main [class*='tile'],",
+      "#syncetc-component-shell > main [class*='stat'],",
+      "#syncetc-component-shell > main [class*='hero'],",
+      "#syncetc-component-shell > main [class*='section'],",
+      "#syncetc-component-shell > .club-header-wrapper .club-header-card,",
+      "#syncetc-component-shell > footer [class*='card'],",
+      "#syncetc-component-shell > footer [class*='panel']{",
+      "border-radius:var(--se-layout-card-radius,18px)!important;",
+      "box-shadow:var(--se-layout-card-shadow,none)!important;",
+      "}",
+
+      "#syncetc-component-shell > main [class*='hero']{",
+      "min-height:var(--se-layout-hero-min,auto)!important;",
+      "padding-top:var(--se-layout-hero-pad-y,inherit)!important;",
+      "padding-bottom:var(--se-layout-hero-pad-y,inherit)!important;",
+      "}",
+
+      "#syncetc-component-shell > .club-header-wrapper{",
+      "padding-top:var(--se-layout-nav-pad-y,inherit)!important;",
+      "padding-bottom:var(--se-layout-nav-pad-y,inherit)!important;",
+      "}",
+
+      "#syncetc-component-shell > .syncetc-drawer,",
+      "#syncetc-component-shell > .syncetc-drawer *,",
+      "#syncetc-component-shell .syncetc-admin-fab{",
+      "border-radius:revert-layer;",
+      "box-shadow:revert-layer;",
+      "}"
     ].join("");
     document.head.appendChild(style);
   }
