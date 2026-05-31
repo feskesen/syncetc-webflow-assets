@@ -1,4 +1,4 @@
-/* COMPONENT-customer-style-v1.js | passes baseline/current page settings | Generated: 2026-05-31 18:50:08 UTC */
+/* COMPONENT-customer-style-v1.js | Plain Jane visual variable support | Generated: 2026-05-31 20:27:07 UTC */
 (function () {
   "use strict";
   window.SyncEtc = window.SyncEtc || {};
@@ -108,6 +108,10 @@
     target.style.setProperty("--se-aero-sky",theme.sky||"#eaf5ff");
     target.style.setProperty("--se-aero-text",theme.text||"#1e2933");
     target.style.setProperty("--se-aero-muted",theme.muted||"#5d6b78");
+    target.style.setProperty("--se-aero-card",theme.card||theme.cardBackground||"rgba(255,255,255,.94)");
+    target.style.setProperty("--se-aero-border",theme.border||"rgba(18,54,90,.16)");
+    target.style.setProperty("--se-aero-page",theme.page||theme.pageBackground||"#ffffff");
+    target.style.setProperty("--se-aero-soft",theme.soft||theme.softBackground||theme.sky||"#f8fafc");
   }
 
   function ensureLayoutStyles(){
@@ -119,6 +123,7 @@
 
       "#syncetc-component-shell{max-width:var(--se-layout-shell-max,1180px)!important;margin-left:auto!important;margin-right:auto!important;}",
 
+      "#syncetc-component-shell{background:var(--se-layout-page-bg,#ffffff)!important;}",
       "#syncetc-component-shell > main{display:block!important;}",
       "#syncetc-component-shell > main section{margin-bottom:var(--se-layout-section-gap,24px)!important;}",
 
@@ -145,6 +150,8 @@
       "#syncetc-component-shell > footer [class*='panel']{",
       "border-radius:var(--se-layout-card-radius,18px)!important;",
       "box-shadow:var(--se-layout-card-shadow,none)!important;",
+      "border-color:var(--se-layout-border-color,rgba(18,54,90,.16))!important;",
+      "background-color:var(--se-layout-surface,rgba(255,255,255,.94))!important;",
       "}",
 
       "#syncetc-component-shell > main [class*='hero']{",
@@ -217,6 +224,9 @@
     target.style.setProperty("--se-layout-hero-pad-y",heroPad);
     target.style.setProperty("--se-layout-shell-max",shellMax);
     target.style.setProperty("--se-layout-nav-pad-y",navPad);
+    target.style.setProperty("--se-layout-border-color",layout.borderColor||"rgba(18,54,90,.16)");
+    target.style.setProperty("--se-layout-surface",layout.surface||"rgba(255,255,255,.94)");
+    target.style.setProperty("--se-layout-page-bg",layout.pageBackground||"#ffffff");
   }
 
   function applyCustomerCssVars(rootEl, customerConfig){
