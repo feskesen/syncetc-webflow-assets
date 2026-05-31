@@ -1,3 +1,4 @@
+/* COMPONENT-master-header-v1.js | view-as visibility fix | Generated: 2026-05-31 06:45:47 UTC */
 /* COMPONENT-master-header-v1.js - BEGIN | real relative links + auth sync */
 (function () {
   "use strict";
@@ -116,16 +117,14 @@
   }
 
   function roleAllowsMember(s, audience) {
-    if (audience === "member" || audience === "admin") return true;
-    return isSignedInSnapshot(s);
+    // View As controls rendered-page visibility. Real login still controls editor access elsewhere.
+    if (audience === "admin" || audience === "member") return true;
+    return false;
   }
 
   function roleAllowsAdmin(s, audience) {
-    if (audience === "admin") return true;
-    if (!isSignedInSnapshot(s)) return false;
-    if (s.is_syncetc_super_admin) return true;
-    if (s.platform_role && String(s.platform_role).toLowerCase().indexOf("admin") >= 0) return true;
-    return Number(s.active_customer_role_rank || 0) >= 400;
+    // View As controls rendered-page visibility. Real login still controls editor access elsewhere.
+    return audience === "admin";
   }
 
   function navRows(ctx) {

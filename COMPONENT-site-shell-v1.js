@@ -1,3 +1,4 @@
+/* COMPONENT-site-shell-v1.js | default highest role view-as | Generated: 2026-05-31 06:45:47 UTC */
 /* COMPONENT-site-shell-v1.js - BEGIN */
 (function () {
   "use strict";
@@ -39,7 +40,7 @@
   }
 
   function create(mountId,options){
-    var state=Object.assign({customerKey:"demo_flying_club",customerName:"Demo Flying Club",pageKey:"events",audience:"public",viewAs:"public",showControls:true,showBanner:false,siteEditorOpen:false,customerSettingsOpen:false,drawerOpen:false,drawerTab:"site",local:{},version:VERSION,lastPageHtml:""},options||{});
+    var state=Object.assign({customerKey:"demo_flying_club",customerName:"Demo Flying Club",pageKey:"events",audience:"public",viewAs:"public",showControls:true,showBanner:false,siteEditorOpen:false,customerSettingsOpen:false,drawerOpen:false,drawerTab:"site",local:{},version:VERSION},options||{});
     state.local=Object.assign({},state.local||{});
     var qs=new URLSearchParams(window.location.search), q=clean(qs.get("customer_key")||qs.get("customer"));
     if(q){state.customerKey=q;state.customerName=customerNameFromKey(q);}
@@ -50,36 +51,32 @@
     function customer(){return window.SyncEtc.Components.CustomerStyle.getCustomerConfig(state.customerKey,state.local||{});}
     function loadCustomer(){return window.SyncEtc.Components.CustomerStyle.loadCustomerConfig(state.customerKey).then(function(c){state.customerName=c.customerName||customerNameFromKey(state.customerKey);return c;});}
     function setLocal(field,value){state.local[field]=value;}
-    function setViewAs(value){state.viewAs=value||"public";state.audience=effectiveAudience();}
+    function setViewAs(value){state.viewAsManuallySet=true;state.viewAs=value||"public";state.audience=effectiveAudience();}
     function setCustomerKey(value){state.customerKey=value||"demo_flying_club";state.customerName=customerNameFromKey(state.customerKey);state.local={};}
     function setEditorOpen(value){state.siteEditorOpen=!!value;state.drawerOpen=!!value;if(value)state.drawerTab="site";}
     function setCustomerSettingsOpen(value){state.customerSettingsOpen=!!value;state.drawerOpen=!!value;if(value)state.drawerTab="customer";}
     function setDrawerOpen(value){state.drawerOpen=!!value;}
     function setDrawerTab(value){state.drawerTab=value||"site";}
-    function updateState(patch){
-      patch=patch||{};
-      Object.keys(patch).forEach(function(k){
-        if(k==="local") state.local=Object.assign({},state.local||{},patch.local||{});
-        else if(k==="customerName") state.customerName=patch.customerName||state.customerName;
-        else if(k==="customerKey") state.customerKey=patch.customerKey||state.customerKey;
-        else state[k]=patch[k];
-      });
-      if(!state.customerKey && state.customerName){
-        var n=String(state.customerName).toLowerCase();
-        if(n.indexOf("150th")>=0)state.customerKey="150th_aero";
-        else if(n.indexOf("demo")>=0)state.customerKey="demo_flying_club";
-      }
-    }
-    function refreshSecurityAndRender(){
-      if(!(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.refresh))return;
-      var key=state.customerKey||"demo_flying_club";
-      window.SyncEtc.SecurityContext.refresh(key).then(function(){ render(state.lastPageHtml||""); }).catch(function(){});
-    }
     function getState(){return JSON.parse(JSON.stringify(state));}
     function security(){return window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.getSnapshot?window.SyncEtc.SecurityContext.getSnapshot():{};}
     function canSite(){return !!(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isPlatformAdmin&&window.SyncEtc.SecurityContext.isPlatformAdmin());}
     function canCustomer(){return !!(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.isCustomerAdmin&&window.SyncEtc.SecurityContext.isCustomerAdmin(state.customerKey));}
     function signOut(){if(window.SyncEtc.SecurityContext&&window.SyncEtc.SecurityContext.signOutHard)window.SyncEtc.SecurityContext.signOutHard();}
+    function highestRealViewAs(){
+      try{
+        if(canSite())return "platform";
+        if(canCustomer())return "admin";
+        var sec=security();
+        if(sec&&sec.signed_in)return "member";
+      }catch(e){}
+      return "public";
+    }
+    function applyDefaultViewAsFromRealRole(){
+      if(state.viewAsManuallySet)return;
+      var v=highestRealViewAs();
+      state.viewAs=v;
+      state.audience=effectiveAudience();
+    }
 
     function getSavePayload(){
       var c=customer(), content=c.content||{}, local=state.local||{};
@@ -138,7 +135,6 @@
     }
 
     function render(pageHtml){
-      state.lastPageHtml=pageHtml||"";
       var C=window.SyncEtc.Components,U=C.Utils; C.BaseStyles.install();
       var c=customer(), shellId="syncetc-component-shell", audience=effectiveAudience();
       mount.innerHTML=`<div id="${shellId}" class="syncetc-shell" data-se-customer-key="${U.esc(state.customerKey)}" data-se-view-as="${U.esc(state.viewAs)}">${C.MasterHeader.render({customer:c,pageKey:state.pageKey,audience:audience,viewAs:state.viewAs})}<main data-se-page-body>${pageHtml||""}</main>${C.MasterFooter.render({customer:c,pageKey:state.pageKey,audience:audience,viewAs:state.viewAs})}${drawerHtml(c,audience)}</div>`;
@@ -149,13 +145,7 @@
       if(C.CustomerSettings)C.CustomerSettings.bind(api,shell);
     }
 
-    var authListenerInstalled=false;
-    if(!authListenerInstalled){
-      authListenerInstalled=true;
-      try{document.addEventListener("syncetc:auth-soft-change",function(){refreshSecurityAndRender();});}catch(e){}
-      setTimeout(refreshSecurityAndRender,50);
-    }
-    var api={render:render,customer:customer,loadCustomer:loadCustomer,getState:getState,updateState:updateState,setLocal:setLocal,setViewAs:setViewAs,setCustomerKey:setCustomerKey,setEditorOpen:setEditorOpen,setCustomerSettingsOpen:setCustomerSettingsOpen,setDrawerOpen:setDrawerOpen,setDrawerTab:setDrawerTab,getSavePayload:getSavePayload,refreshSecurityAndRender:refreshSecurityAndRender};
+    var api={render:render,customer:customer,loadCustomer:loadCustomer,getState:getState,setLocal:setLocal,setViewAs:setViewAs,setCustomerKey:setCustomerKey,setEditorOpen:setEditorOpen,setCustomerSettingsOpen:setCustomerSettingsOpen,setDrawerOpen:setDrawerOpen,setDrawerTab:setDrawerTab,getSavePayload:getSavePayload};
     return api;
   }
   window.SyncEtc.Components.SiteShell={create:create,version:VERSION};
