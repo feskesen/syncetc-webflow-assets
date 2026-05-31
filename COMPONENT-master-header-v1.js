@@ -1,4 +1,4 @@
-/* COMPONENT-master-header-v1.js | view-as visibility fix | Generated: 2026-05-31 06:45:47 UTC */
+/* COMPONENT-master-header-v1.js | view-as visibility retained | Generated: 2026-05-31 06:53:53 UTC */
 /* COMPONENT-master-header-v1.js - BEGIN | real relative links + auth sync */
 (function () {
   "use strict";

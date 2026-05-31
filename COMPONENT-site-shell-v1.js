@@ -1,4 +1,4 @@
-/* COMPONENT-site-shell-v1.js | default highest role view-as | Generated: 2026-05-31 06:45:47 UTC */
+/* COMPONENT-site-shell-v1.js | default highest role + initial Supabase preset load | Generated: 2026-05-31 06:53:53 UTC */
 /* COMPONENT-site-shell-v1.js - BEGIN */
 (function () {
   "use strict";
@@ -40,7 +40,7 @@
   }
 
   function create(mountId,options){
-    var state=Object.assign({customerKey:"demo_flying_club",customerName:"Demo Flying Club",pageKey:"events",audience:"public",viewAs:"public",showControls:true,showBanner:false,siteEditorOpen:false,customerSettingsOpen:false,drawerOpen:false,drawerTab:"site",local:{},version:VERSION},options||{});
+    var state=Object.assign({customerKey:"demo_flying_club",customerName:"Demo Flying Club",pageKey:"events",audience:"public",viewAs:"public",showControls:true,showBanner:false,siteEditorOpen:false,customerSettingsOpen:false,drawerOpen:false,drawerTab:"site",local:{},version:VERSION,viewAsManuallySet:false,loadedCustomerKey:"",loadingCustomerKey:"",lastPageHtml:""},options||{});
     state.local=Object.assign({},state.local||{});
     var qs=new URLSearchParams(window.location.search), q=clean(qs.get("customer_key")||qs.get("customer"));
     if(q){state.customerKey=q;state.customerName=customerNameFromKey(q);}
@@ -52,7 +52,7 @@
     function loadCustomer(){return window.SyncEtc.Components.CustomerStyle.loadCustomerConfig(state.customerKey).then(function(c){state.customerName=c.customerName||customerNameFromKey(state.customerKey);return c;});}
     function setLocal(field,value){state.local[field]=value;}
     function setViewAs(value){state.viewAsManuallySet=true;state.viewAs=value||"public";state.audience=effectiveAudience();}
-    function setCustomerKey(value){state.customerKey=value||"demo_flying_club";state.customerName=customerNameFromKey(state.customerKey);state.local={};}
+    function setCustomerKey(value){state.customerKey=value||"demo_flying_club";state.customerName=customerNameFromKey(state.customerKey);state.local={};state.loadedCustomerKey="";state.loadingCustomerKey="";}
     function setEditorOpen(value){state.siteEditorOpen=!!value;state.drawerOpen=!!value;if(value)state.drawerTab="site";}
     function setCustomerSettingsOpen(value){state.customerSettingsOpen=!!value;state.drawerOpen=!!value;if(value)state.drawerTab="customer";}
     function setDrawerOpen(value){state.drawerOpen=!!value;}
@@ -135,6 +135,19 @@
     }
 
     function render(pageHtml){
+      state.lastPageHtml=pageHtml||"";
+      applyDefaultViewAsFromRealRole();
+      if(state.customerKey && state.loadedCustomerKey!==state.customerKey && state.loadingCustomerKey!==state.customerKey){
+        state.loadingCustomerKey=state.customerKey;
+        loadCustomer().then(function(){
+          state.loadedCustomerKey=state.customerKey;
+          state.loadingCustomerKey="";
+          render(state.lastPageHtml||"");
+        }).catch(function(){
+          state.loadingCustomerKey="";
+          state.loadedCustomerKey=state.customerKey;
+        });
+      }
       var C=window.SyncEtc.Components,U=C.Utils; C.BaseStyles.install();
       var c=customer(), shellId="syncetc-component-shell", audience=effectiveAudience();
       mount.innerHTML=`<div id="${shellId}" class="syncetc-shell" data-se-customer-key="${U.esc(state.customerKey)}" data-se-view-as="${U.esc(state.viewAs)}">${C.MasterHeader.render({customer:c,pageKey:state.pageKey,audience:audience,viewAs:state.viewAs})}<main data-se-page-body>${pageHtml||""}</main>${C.MasterFooter.render({customer:c,pageKey:state.pageKey,audience:audience,viewAs:state.viewAs})}${drawerHtml(c,audience)}</div>`;
@@ -145,6 +158,7 @@
       if(C.CustomerSettings)C.CustomerSettings.bind(api,shell);
     }
 
+    try{document.addEventListener("syncetc:auth-soft-change",function(){applyDefaultViewAsFromRealRole();render(state.lastPageHtml||"");});}catch(e){}
     var api={render:render,customer:customer,loadCustomer:loadCustomer,getState:getState,setLocal:setLocal,setViewAs:setViewAs,setCustomerKey:setCustomerKey,setEditorOpen:setEditorOpen,setCustomerSettingsOpen:setCustomerSettingsOpen,setDrawerOpen:setDrawerOpen,setDrawerTab:setDrawerTab,getSavePayload:getSavePayload};
     return api;
   }

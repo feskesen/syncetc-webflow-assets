@@ -1,4 +1,4 @@
-/* COMPONENT-customer-settings-v1.js - BEGIN | clean default restore + dirty guards */
+/* COMPONENT-customer-settings-v1.js | left-align default text | Generated: 2026-05-31 06:53:53 UTC */
 (function(){
 "use strict";
 window.SyncEtc=window.SyncEtc||{};
@@ -149,7 +149,7 @@ function installStyles(){
     .se-customer-settings-control textarea{min-height:78px;resize:vertical}
     .se-customer-settings-control small{display:block;margin-top:4px;color:#64748b;font-size:11px;line-height:1.35}
     .se-customer-settings-control.is-deleted input,.se-customer-settings-control.is-deleted textarea{background:#fffaf0;border-style:dashed}
-    .se-cs-default-link{display:inline;border:0;background:transparent;color:#12365a!important;text-decoration:underline;text-underline-offset:2px;font:inherit;font-weight:900;cursor:pointer;padding:0;line-height:inherit}
+    .se-cs-default-link{display:inline!important;width:auto!important;min-height:0!important;border:0!important;background:transparent!important;color:#12365a!important;text-decoration:underline;text-underline-offset:2px;font:inherit!important;font-weight:900!important;cursor:pointer;padding:0!important;line-height:inherit!important;text-align:left!important;justify-content:flex-start!important;box-shadow:none!important;border-radius:0!important}
     .se-customer-settings-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
     .se-customer-settings-actions button,.se-manager-link{border:1px solid rgba(18,54,90,.20);border-radius:999px;padding:9px 11px;background:#12365a;color:#fff!important;font-weight:900;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
     .se-customer-settings-actions button.secondary,.se-manager-link.secondary{background:#fff;color:#12365a!important}
