@@ -1,4 +1,4 @@
-/* COMPONENT-customer-style-v1.js | generic preset cssVars support | Generated: 2026-05-31 20:45:06 UTC */
+/* COMPONENT-customer-style-v1.js | HOTFIX cssVars helper restored | Generated: 2026-05-31 20:50:45 UTC */
 (function () {
   "use strict";
   window.SyncEtc = window.SyncEtc || {};
@@ -97,6 +97,17 @@
   function themeForPreset(customerConfig,presetKey){
     var presets=(customerConfig&&customerConfig.availablePresets)||FALLBACK_PRESETS;
     return presetByKey(presets,presetKey).theme || FALLBACK_PRESETS[0].theme;
+  }
+
+  function applyCssVarsObject(target,vars){
+    vars=vars||{};
+    Object.keys(vars).forEach(function(key){
+      var name=String(key||"").trim();
+      var value=vars[key];
+      if(!name || value==null) return;
+      if(name.indexOf("--se-")!==0) return;
+      target.style.setProperty(name,String(value));
+    });
   }
 
   function applyThemeVars(rootEl,theme){
@@ -228,6 +239,7 @@
     target.style.setProperty("--se-layout-border-color",layout.borderColor||"rgba(18,54,90,.16)");
     target.style.setProperty("--se-layout-surface",layout.surface||"rgba(255,255,255,.94)");
     target.style.setProperty("--se-layout-page-bg",layout.pageBackground||"#ffffff");
+    applyCssVarsObject(target,layout.cssVars||layout.css_vars);
   }
 
   function applyCustomerCssVars(rootEl, customerConfig){
