@@ -1,4 +1,4 @@
-/* COMPONENT-master-controls-v1.js | immediate layout preset preview | Generated: 2026-05-31 08:33:49 UTC */
+/* COMPONENT-master-controls-v1.js | editor z-index + global immediate preview | Generated: 2026-06-01 00:36:47 UTC */
 /* COMPONENT-master-controls-v1.js - BEGIN */
 (function(){
 "use strict";
@@ -173,6 +173,9 @@ function getToken(){
 }
 function nested(o,path,fallback){try{return path.split(".").reduce(function(a,k){return a&&a[k];},o)||fallback||"";}catch(e){return fallback||"";}}
 function installStyles(){U().installStyle("COMPONENT-master-controls-v17-style",`
+    .syncetc-drawer{z-index:2147483000!important;position:fixed!important;pointer-events:auto!important;}
+    .syncetc-drawer *{pointer-events:auto;}
+    .syncetc-drawer select,.syncetc-drawer input,.syncetc-drawer textarea,.syncetc-drawer button{position:relative!important;z-index:2147483002!important;pointer-events:auto!important;}
     .syncetc-drawer .se-site-editor,
     .syncetc-drawer .se-site-editor *{box-sizing:border-box}
     .syncetc-drawer .se-site-editor{padding:0;background:transparent;font-family:inherit;color:#102034}
@@ -406,7 +409,9 @@ function previewLayoutPreset(api,value){
     var layout=Object.assign({},item.layout||{});
     layout.preset=value||layout.preset||item.layout_key||"standard-layout";
     if(window.SyncEtc&&window.SyncEtc.Components&&window.SyncEtc.Components.CustomerStyle&&window.SyncEtc.Components.CustomerStyle.applyLayoutVars){
-      window.SyncEtc.Components.CustomerStyle.applyLayoutVars(document.getElementById("syncetc-component-shell"),layout);
+      var shell=document.getElementById("syncetc-component-shell");
+      window.SyncEtc.Components.CustomerStyle.applyLayoutVars(shell,layout);
+      window.SyncEtc.Components.CustomerStyle.applyLayoutVars(document.documentElement,layout);
     }
   }catch(err){}
 }
@@ -418,7 +423,9 @@ function handleLocal(api,editor,t){
   if(field==="stylePresetKey"){
     var c=api.customer();
     var theme=window.SyncEtc.Components.CustomerStyle.themeForPreset(c,value);
-    window.SyncEtc.Components.CustomerStyle.applyThemeVars(document.getElementById("syncetc-component-shell"),theme);
+    var shell=document.getElementById("syncetc-component-shell");
+    window.SyncEtc.Components.CustomerStyle.applyThemeVars(shell,theme);
+    window.SyncEtc.Components.CustomerStyle.applyThemeVars(document.documentElement,theme);
     markStatus(editor,"Unsaved style preset change. Click Save Site Settings to persist.","warn");
   }
 

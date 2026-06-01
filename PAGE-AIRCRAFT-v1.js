@@ -1,4 +1,4 @@
-/* PAGE-AIRCRAFT-v1.js | unboxed style variable support | Generated: 2026-05-31 20:45:06 UTC */
+/* PAGE-AIRCRAFT-v1.js | unboxed site-wide style support | Generated: 2026-06-01 00:36:47 UTC */
 (function () {
   "use strict";
 
@@ -177,7 +177,7 @@
     var style = document.createElement("style");
     style.id = STYLE_ID;
     style.textContent = `
-      .aero-fleet-page { max-width:var(--se-aero-page-max-width,1180px); margin:var(--se-aero-page-margin,34px auto 56px); padding:var(--se-aero-page-padding,0 18px); font-family:Arial, Helvetica, sans-serif; color:var(--se-aero-text, #1e2933); background:var(--se-aero-page-bg, transparent); }
+      .aero-fleet-page { max-width:var(--se-aero-page-max-width,1180px); margin:var(--se-aero-page-margin,34px auto 56px); padding:var(--se-aero-page-padding,0 18px); font-family:var(--se-site-font-family,Arial,Helvetica,sans-serif); color:var(--se-aero-text, #1e2933); background:var(--se-aero-page-bg, transparent); }
       .aero-fleet-shell { background:var(--se-aero-shell-bg, var(--se-aero-card, rgba(255,255,255,.94))); border:var(--se-aero-shell-border-width,1px) solid var(--se-aero-shell-border-color,var(--se-aero-border, rgba(18,54,90,.16))); border-radius:var(--se-aero-shell-radius,var(--se-radius-xl, 26px)); box-shadow:var(--se-aero-shell-shadow,var(--se-shadow-lg, 0 18px 50px rgba(12,38,64,.22))); overflow:var(--se-aero-shell-overflow,hidden); backdrop-filter:var(--se-aero-shell-backdrop,blur(8px)); }
       .aero-fleet-hero { position:relative; padding:var(--se-aero-hero-padding,34px 34px 28px); background:var(--se-aero-hero-bg,linear-gradient(135deg, var(--se-aero-navy, #12365a), var(--se-aero-blue, #2f80c4)),radial-gradient(circle at top right, rgba(255,255,255,.34), transparent 36%)); color:var(--se-aero-hero-text,#fff); border:var(--se-aero-hero-border,0); box-shadow:var(--se-aero-hero-shadow,none); border-radius:var(--se-aero-hero-radius,0); }
       .aero-fleet-eyebrow { display:inline-flex; align-items:center; gap:8px; margin-bottom:12px; padding:var(--se-aero-eyebrow-padding,6px 12px); border-radius:var(--se-aero-eyebrow-radius,999px); background:var(--se-aero-eyebrow-bg,rgba(255,255,255,.16)); border:var(--se-aero-eyebrow-border,1px solid rgba(255,255,255,.24)); color:var(--se-aero-eyebrow-text,var(--se-aero-hero-text,#fff)); font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
