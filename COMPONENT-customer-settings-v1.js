@@ -1,4 +1,4 @@
-/* COMPONENT-customer-settings-v1.js | baseline defaults + current values | Generated: 2026-05-31 18:50:08 UTC */
+/* COMPONENT-customer-settings-v1.js | clean content-editor restore | Generated: 2026-06-01 01:04:15 UTC */
 (function(){
 "use strict";
 window.SyncEtc=window.SyncEtc||{};

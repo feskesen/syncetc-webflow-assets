@@ -1,4 +1,4 @@
-/* COMPONENT-master-header-v1.js | global style variable support | Generated: 2026-06-01 00:36:47 UTC */
+/* COMPONENT-master-header-v1.js | clean content-editor restore | Generated: 2026-06-01 01:04:15 UTC */
 (function () {
   "use strict";
 
@@ -11,27 +11,27 @@
   function installStyles() {
     const U = window.SyncEtc.Components.Utils;
     U.installStyle("COMPONENT-master-header-v4-style", `
-      .club-header-wrapper { max-width:var(--se-header-max-width,var(--se-layout-shell-max,1180px)); margin:var(--se-header-margin,0 auto 16px); padding:var(--se-header-padding,0 18px); color:var(--se-aero-text); font-family:var(--se-site-font-family,Arial,Helvetica,sans-serif); }
-      .club-header-card { display:grid; grid-template-columns:var(--se-header-logo-col,168px) minmax(0,1fr); background:var(--se-header-bg,var(--se-aero-card)); border:var(--se-header-border,1px solid var(--se-aero-border)); border-radius:var(--se-header-radius,var(--se-aero-radius-xl)); box-shadow:var(--se-header-shadow,var(--se-aero-shadow)); overflow:visible; backdrop-filter:var(--se-header-backdrop,blur(8px)); }
-      .club-logo-column { display:flex; align-items:center; justify-content:center; padding:var(--se-header-logo-column-padding,10px); border-right:var(--se-header-logo-column-border,1px solid var(--se-aero-border)); background:var(--se-header-logo-column-bg,linear-gradient(180deg,rgba(234,245,255,.96),rgba(255,255,255,.86))); border-radius:var(--se-header-logo-column-radius,var(--se-aero-radius-xl) 0 0 var(--se-aero-radius-xl)); }
-      .club-logo-panel { width:100%; min-height:100%; display:flex; align-items:center; justify-content:center; padding:var(--se-header-logo-panel-padding,10px); border-radius:var(--se-header-logo-panel-radius,18px); background:var(--se-header-logo-panel-bg,#fff); border:var(--se-header-logo-panel-border,1px solid rgba(18,54,90,.14)); box-shadow:var(--se-header-logo-panel-shadow,0 8px 20px rgba(12,38,64,.11)); }
+      .club-header-wrapper { max-width:1180px; margin:0 auto 16px; padding:0 18px; color:var(--se-aero-text); }
+      .club-header-card { display:grid; grid-template-columns:168px minmax(0,1fr); background:var(--se-aero-card); border:1px solid var(--se-aero-border); border-radius:var(--se-aero-radius-xl); box-shadow:var(--se-aero-shadow); overflow:visible; backdrop-filter:blur(8px); }
+      .club-logo-column { display:flex; align-items:center; justify-content:center; padding:10px; border-right:1px solid var(--se-aero-border); background:linear-gradient(180deg,rgba(234,245,255,.96),rgba(255,255,255,.86)); border-radius:var(--se-aero-radius-xl) 0 0 var(--se-aero-radius-xl); }
+      .club-logo-panel { width:100%; min-height:100%; display:flex; align-items:center; justify-content:center; padding:10px; border-radius:18px; background:#fff; border:1px solid rgba(18,54,90,.14); box-shadow:0 8px 20px rgba(12,38,64,.11); }
       .club-logo { max-width:130px; max-height:146px; object-fit:contain; }
-      .club-header-top { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px; align-items:center; padding:var(--se-header-top-padding,7px 16px); background:var(--se-header-top-bg,linear-gradient(135deg,var(--se-aero-navy),var(--se-aero-blue))); border-radius:var(--se-header-top-radius,0 var(--se-aero-radius-xl) 13px 0); color:var(--se-header-top-text,#fff); }
+      .club-header-top { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px; align-items:center; padding:7px 16px; background:linear-gradient(135deg,var(--se-aero-navy),var(--se-aero-blue)); border-radius:0 var(--se-aero-radius-xl) 13px 0; color:#fff; }
       .club-brand-line { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-      .club-name { color:var(--se-header-name-color,var(--se-header-top-text,#fff)); font-size:var(--se-header-name-size,clamp(22px,2.55vw,32px)); font-weight:800; letter-spacing:-.035em; line-height:.98; }
-      .club-founded { display:inline-flex; padding:var(--se-header-founded-padding,4px 10px); border-radius:var(--se-header-founded-radius,999px); background:var(--se-header-founded-bg,rgba(255,255,255,.16)); border:var(--se-header-founded-border,1px solid rgba(255,255,255,.24)); color:var(--se-header-founded-text,rgba(255,255,255,.90)); font-size:10px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
+      .club-name { color:#fff; font-size:clamp(22px,2.55vw,32px); font-weight:800; letter-spacing:-.035em; line-height:.98; }
+      .club-founded { display:inline-flex; padding:4px 10px; border-radius:999px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.24); color:rgba(255,255,255,.90); font-size:10px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
       .club-auth-buttons { display:flex; justify-content:flex-end; align-items:center; gap:7px; flex-wrap:wrap; }
-      .club-auth-user { display:inline-flex; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--se-header-auth-text,rgba(255,255,255,.94)); font-size:11.5px; font-weight:900; }
+      .club-auth-user { display:inline-flex; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:rgba(255,255,255,.94); font-size:11.5px; font-weight:900; }
       .club-auth-btn { min-height:31px; padding:6px 13px; border-radius:999px; border:1px solid rgba(255,255,255,.32); font-weight:800; font-size:12.5px; cursor:pointer; }
       .club-auth-btn.login { background:#fff; color:var(--se-aero-navy); }
       .club-auth-btn.logout { background:rgba(255,255,255,.14); color:#fff; }
-      .club-nav-stack { display:flex; flex-direction:column; gap:4px; padding:var(--se-header-nav-stack-padding,7px 10px 8px); background:var(--se-header-nav-stack-bg,rgba(255,255,255,.72)); border-radius:var(--se-header-nav-stack-radius,0 0 var(--se-aero-radius-xl) 0); }
+      .club-nav-stack { display:flex; flex-direction:column; gap:4px; padding:7px 10px 8px; background:rgba(255,255,255,.72); border-radius:0 0 var(--se-aero-radius-xl) 0; }
       .club-nav-row { display:flex; justify-content:center; }
-      .club-nav-inner { width:100%; display:flex; align-items:center; gap:8px; padding:var(--se-header-nav-inner-padding,4px 8px); border-radius:var(--se-header-nav-inner-radius,999px); border:var(--se-header-nav-inner-border,1px solid var(--se-aero-border)); box-shadow:var(--se-header-nav-inner-shadow,0 3px 9px rgba(12,38,64,.045)); }
+      .club-nav-inner { width:100%; display:flex; align-items:center; gap:8px; padding:4px 8px; border-radius:999px; border:1px solid var(--se-aero-border); box-shadow:0 3px 9px rgba(12,38,64,.045); }
       .club-nav-label { display:inline-flex; min-width:58px; justify-content:center; padding:3px 8px; border-radius:999px; font-size:9.5px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
       .club-nav-links { display:flex; flex:1; flex-wrap:wrap; gap:3px 6px; justify-content:center; align-items:center; }
-      .club-nav-link { display:inline-flex; min-height:22px; align-items:center; padding:3px 8px; border-radius:var(--se-header-nav-link-radius,999px); color:var(--se-header-nav-link-text,var(--se-aero-navy)); font-size:12.5px; font-weight:800; text-decoration:none; white-space:nowrap; }
-      .club-nav-link.is-active { background:var(--se-header-active-bg,var(--se-aero-navy)); color:var(--se-header-active-text,#fff) !important; box-shadow:var(--se-header-active-shadow,0 5px 13px rgba(18,54,90,.16)); }
+      .club-nav-link { display:inline-flex; min-height:22px; align-items:center; padding:3px 8px; border-radius:999px; color:var(--se-aero-navy); font-size:12.5px; font-weight:800; text-decoration:none; white-space:nowrap; }
+      .club-nav-link.is-active { background:var(--se-aero-navy); color:#fff !important; box-shadow:0 5px 13px rgba(18,54,90,.16); }
       .club-nav-row.public .club-nav-inner { background:rgba(255,255,255,.92); }
       .club-nav-row.public .club-nav-label { background:var(--se-aero-sky); color:var(--se-aero-navy); }
       .club-nav-row.member .club-nav-inner { background:linear-gradient(180deg,rgba(234,245,255,.96),rgba(255,255,255,.88)); }
